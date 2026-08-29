@@ -209,16 +209,20 @@ def property_edit(request, property_id):
                 _save_dynamic_details(prop, request.POST)
                 _save_consents(prop.publication, request.POST)
                 _save_photos(prop, request, request.POST)
-                if request.POST.get('submit') == '1':
+                submitting = request.POST.get('submit') == '1'
+                if submitting:
                     _validate_publication_ready(prop.publication)
+                    now = timezone.now()
                     prop.status = 'UNDER_REVIEW'
-                    prop.publication.status = 'SUBMITTED'
-                    prop.publication.submitted_at = timezone.now()
-                    prop.publication.save(update_fields=['status', 'submitted_at', 'updated_at'])
+                    prop.save(update_fields=['status', 'updated_at'])
+                    prop.publication.status = 'UNDER_REVIEW'
+                    prop.publication.submitted_at = now
+                    prop.publication.correction_message = ''
+                    prop.publication.save(update_fields=['status', 'submitted_at', 'correction_message', 'updated_at'])
                 else:
                     prop.save(update_fields=['updated_at'])
-            messages.success(request, 'Modifications enregistrées.')
-            if request.POST.get('submit') == '1': messages.success(request, 'Publication soumise à Fasthome pour vérification.')
-            return redirect('property_edit', property_id=prop.property_id)
-        except (ValidationError, TypeError, ValueError) as exc: messages.error(request, str(exc))
+            messages.success(request, 'Publication envoyée en vérification.' if submitting else 'Brouillon enregistré.')
+            return redirect('property_manage' if submitting else 'property_edit', property_id=prop.property_id)
+        except (ValidationError, TypeError, ValueError) as exc:
+            messages.error(request, str(exc))
     return render(request, 'properties/form.html', _context(types=PropertyType.objects.filter(active=True), property=prop, creating=False))
