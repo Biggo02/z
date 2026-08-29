@@ -80,13 +80,13 @@
   <section class="details-card" aria-label="Détails du logement">
     <div class="details-grid">
       <div class="detail-field"><span class="label">Type de bien</span><span class="value">{{ property.property_type }}</span></div>
-      <div class="detail-field"><span class="label">Salon(s)</span><span class="value">{{ property.living_room_count }}</span></div>
+      <div class="detail-field"><span class="label">Salons</span><span class="value">{{ property.living_room_count }}</span></div>
       <div class="detail-field"><span class="label">Source d'eau</span><span class="value">{{ property.get_water_source_display|default:"Non renseignée" }}</span></div>
       <div class="detail-field"><span class="label">Étages</span><span class="value">{{ property.floor|default:"Non renseigné" }}</span></div>
       <div class="detail-field"><span class="label">Cuisine</span><span class="value">{% if property.has_kitchen %}1{% else %}Non{% endif %}</span></div>
       <div class="detail-field"><span class="label">Source d'électricité</span><span class="value">{{ property.get_electricity_source_display|default:"Non renseignée" }}</span></div>
       <div class="detail-field"><span class="label">État du bien</span><span class="value">{% if property.status == 'AVAILABLE' %}Bon état{% else %}{{ property.get_status_display }}{% endif %}</span></div>
-      <div class="detail-field"><span class="label">Toilette(s)</span><span class="value">{{ property.toilet_count }}</span></div>
+      <div class="detail-field"><span class="label">Toilettes</span><span class="value">{{ property.toilet_count }}</span></div>
       <div class="detail-field"><span class="label">Surface habitable</span><span class="value">Non renseignée</span></div>
       <div class="detail-field"><span class="label">Disponibilité</span><span class="value">{% if property.status == 'AVAILABLE' %}Disponible{% else %}Selon statut{% endif %}</span></div>
       <div class="detail-field"><span class="label">Meublé</span><span class="value">{% if property.furnished %}Oui{% else %}Non{% endif %}</span></div>
