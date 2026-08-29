@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Dossiers — Fasthome{% endblock %}
+{% block content %}
+<style>
+.cases-shell{max-width:1120px;margin:auto}.cases-hero{position:relative;overflow:hidden;padding:28px;border:1px solid var(--border);border-radius:24px;background:linear-gradient(135deg,var(--surface),var(--surface2));box-shadow:0 18px 55px rgba(11,34,57,.08)}.cases-hero:after{content:'';position:absolute;width:220px;height:220px;border-radius:50%;right:-80px;top:-100px;background:rgba(22,75,122,.1)}.eyebrow{font-size:.72rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.cases-hero h1{margin:7px 0;font-size:clamp(1.55rem,5vw,2.3rem);letter-spacing:-.035em}.cases-hero p{margin:0;color:var(--muted);max-width:720px}.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.summary-card{padding:17px;border:1px solid var(--border);border-radius:18px;background:var(--surface);box-shadow:0 10px 30px rgba(11,34,57,.05)}.summary-card span{display:block;color:var(--muted);font-size:.76rem}.summary-card strong{display:block;margin-top:5px;font-size:1.3rem;letter-spacing:-.02em}.panel{padding:20px;border:1px solid var(--border);border-radius:22px;background:var(--surface);box-shadow:0 12px 35px rgba(11,34,57,.06)}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.panel-head h2{margin:0;font-size:1.05rem}.sub{display:block;margin-top:3px;color:var(--muted);font-size:.72rem}.table-wrap{overflow:auto}table{width:100%;min-width:760px;border-collapse:collapse;font-size:.82rem}th{text-align:left;padding:12px 10px;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}td{padding:14px 10px;border-bottom:1px solid var(--border);vertical-align:middle}.ref{font-weight:900}.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:rgba(22,75,122,.1);color:#164b7a;font-size:.7rem;font-weight:850}.btn-sm{display:inline-flex;align-items:center;justify-content:center;padding:8px 14px;border-radius:999px;border:1px solid var(--accent);background:var(--accent);color:#fff;font:inherit;font-size:.72rem;font-weight:800;cursor:pointer;white-space:nowrap}.empty{padding:38px 15px;text-align:center;color:var(--muted)}@media(max-width:680px){.container{width:calc(100% - 18px)}.cases-hero{padding:21px;border-radius:20px}.summary{grid-template-columns:1fr}.panel{padding:16px;border-radius:19px}.panel-head{align-items:flex-start;flex-direction:column}}
+</style>
+<main class="container cases-shell">
+  <section class="cases-hero">
+    <div class="eyebrow">Espace agent · Dossiers</div>
+    <h1>Suivi des dossiers</h1>
+    <p>Centralisez les dossiers issus des visites et faites avancer chaque candidature jusqu'à la génération des contrats et du procès-verbal.</p>
+  </section>
+
+  <section class="summary">
+    <div class="summary-card"><span>Dossiers</span><strong>{{ cases|length }}</strong></div>
+    <div class="summary-card"><span>À traiter</span><strong>{{ open_count|default:'—' }}</strong></div>
+    <div class="summary-card"><span>En examen</span><strong>{{ review_count|default:'—' }}</strong></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <h2>Dossiers de location</h2>
+      <span class="sub">Vue opérationnelle</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Référence</th><th>Logement</th><th>Visite</th><th>Statut</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for c in cases %}
+          <tr>
+            <td><span class="ref">{{ c.case_id }}</span></td>
+            <td><strong>{{ c.property.property_id }}</strong></td>
+            <td>{{ c.visit.visit_id }}</td>
+            <td><span class="badge">● {{ c.get_status_display }}</span></td>
+            <td>
+              {% if c.status == 'OPEN' or c.status == 'UNDER_REVIEW' %}
+                <form method="post" action="{% url 'office_accept_case' c.case_id %}">
+                  {% csrf_token %}
+                  <button class="btn-sm" type="submit">Accepter &amp; générer</button>
+                </form>
+              {% else %}
+                <span class="sub">Aucune action</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5"><div class="empty">Aucun dossier à afficher pour le moment.</div></td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+{% endblock %}

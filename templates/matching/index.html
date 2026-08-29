@@ -1,0 +1,183 @@
+{% extends 'base.html' %}
+
+{% block title %}Recherche de logement — Fasthome{% endblock %}
+
+{% block content %}
+<main class="container matching-page">
+  <section class="matching-hero">
+    <div class="hero-orbit hero-orbit-a" aria-hidden="true"></div>
+    <div class="hero-orbit hero-orbit-b" aria-hidden="true"></div>
+    <div class="hero-content">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> Recherche intelligente</span>
+      <h1>Trouvez un logement qui vous correspond.</h1>
+      <p>Indiquez vos critères. Fasthome compare les logements disponibles et ne retient que ceux qui respectent les critères renseignés.</p>
+    </div>
+    <div class="hero-mark" aria-hidden="true">
+      <span>⌕</span>
+      <small>F</small>
+    </div>
+  </section>
+
+  <section class="matching-panel">
+    <div class="panel-heading">
+      <div class="heading-icon">⌕</div>
+      <div>
+        <span class="section-kicker">Votre recherche</span>
+        <h2>Définissez vos critères</h2>
+        <p>Plus vous renseignez de critères, plus la sélection est précise.</p>
+      </div>
+    </div>
+
+    <form method="post" class="matching-form" id="matching-form">
+      {% csrf_token %}
+
+      <div class="criteria-group criteria-location">
+        <div class="group-heading">
+          <span class="group-number">01</span>
+          <div><strong>Où souhaitez-vous vivre ?</strong><small>La recherche tolère les accents, majuscules et petites fautes de frappe.</small></div>
+        </div>
+        <div class="fields-grid location-grid">
+          <div class="field field-wide">
+            <label for="province">Province</label>
+            <div class="input-shell"><span class="input-icon">⌖</span><input id="province" name="province" value="{{ values.province|default:'' }}" placeholder="Ex. Haut-Katanga" autocomplete="address-level1"></div>
+          </div>
+          <div class="field">
+            <label for="city_or_territory">Ville ou territoire</label>
+            <div class="input-shell"><span class="input-icon">⌖</span><input id="city_or_territory" name="city_or_territory" value="{{ values.city_or_territory|default:'' }}" placeholder="Ex. Lubumbashi" autocomplete="address-level2"></div>
+          </div>
+          <div class="field">
+            <label for="administrative_subdivision">Commune, secteur ou chefferie</label>
+            <div class="input-shell"><span class="input-icon">⌖</span><input id="administrative_subdivision" name="administrative_subdivision" value="{{ values.administrative_subdivision|default:'' }}" placeholder="Ex. Kampemba"></div>
+          </div>
+          <div class="field field-wide">
+            <label for="neighborhood">Quartier</label>
+            <div class="input-shell"><span class="input-icon">⌖</span><input id="neighborhood" name="neighborhood" value="{{ values.neighborhood|default:'' }}" placeholder="Ex. Golf"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="criteria-divider"></div>
+
+      <div class="criteria-group">
+        <div class="group-heading">
+          <span class="group-number">02</span>
+          <div><strong>Le logement qu'il vous faut</strong><small>Choisissez les caractéristiques minimales souhaitées.</small></div>
+        </div>
+        <div class="fields-grid feature-grid">
+          <div class="field">
+            <label for="minimum_bedrooms">Chambres minimum</label>
+            <div class="input-shell"><span class="input-icon">⌂</span><input id="minimum_bedrooms" type="number" min="0" name="minimum_bedrooms" value="{{ values.minimum_bedrooms|default:0 }}"></div>
+          </div>
+          <div class="field">
+            <label for="minimum_living_rooms">Salons minimum</label>
+            <div class="input-shell"><span class="input-icon">▦</span><input id="minimum_living_rooms" type="number" min="0" name="minimum_living_rooms" value="{{ values.minimum_living_rooms|default:0 }}"></div>
+          </div>
+          <div class="field">
+            <label for="requested_occupants">Occupants maximum</label>
+            <div class="input-shell"><span class="input-icon">♙</span><input id="requested_occupants" type="number" min="1" name="requested_occupants" value="{{ values.requested_occupants|default:1 }}"></div>
+          </div>
+          <div class="field">
+            <label for="furnished_preference">Meublé</label>
+            <div class="input-shell select-shell"><span class="input-icon">✦</span><select id="furnished_preference" name="furnished_preference"><option value="ANY">Peu importe</option><option value="YES" {% if values.furnished_preference == 'YES' %}selected{% endif %}>Oui, meublé</option><option value="NO" {% if values.furnished_preference == 'NO' %}selected{% endif %}>Non meublé</option></select><span class="select-chevron">⌄</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="criteria-divider"></div>
+
+      <div class="criteria-group">
+        <div class="group-heading">
+          <span class="group-number">03</span>
+          <div><strong>Votre budget</strong><small>Le loyer reste masqué sur les résultats publics.</small></div>
+        </div>
+        <div class="budget-row">
+          <div class="field budget-field">
+            <label for="maximum_budget">Budget maximum mensuel</label>
+            <div class="input-shell budget-shell"><span class="input-icon">₣</span><input id="maximum_budget" type="number" min="0" step="0.01" name="maximum_budget" value="{{ values.maximum_budget|default:'' }}" placeholder="Ex. 500000"><span class="input-suffix">FC</span></div>
+          </div>
+          <div class="budget-note"><span class="note-icon">i</span><div><strong>Une information protégée</strong><p>Votre budget sert au matching. Le montant du loyer n'est pas affiché publiquement.</p></div></div>
+        </div>
+      </div>
+
+      <div class="search-footer">
+        <div class="privacy-line"><span>✓</span> Recherche privée · <span>✓</span> Adresse exacte masquée</div>
+        <button class="search-button" type="submit"><span class="search-button-icon">⌕</span><span>Rechercher les logements</span><span class="button-arrow">→</span></button>
+      </div>
+    </form>
+  </section>
+
+  {% if results %}
+  <section class="results-section">
+    <div class="results-header">
+      <div>
+        <span class="section-kicker">Sélection Fasthome</span>
+        <h2>{{ results|length }} {% if results|length == 1 %}logement{% else %}logements{% endif %} trouvé{% if results|length != 1 %}s{% endif %}</h2>
+        <p>Chaque résultat respecte l'ensemble des critères renseignés.</p>
+      </div>
+      <div class="result-quality"><span class="quality-check">✓</span><div><strong>100%</strong><small>compatible</small></div></div>
+    </div>
+
+    <div class="criteria-summary">
+      <span>Vos critères</span>
+      {% if values.province %}<b>⌖ {{ values.province }}</b>{% endif %}
+      {% if values.city_or_territory %}<b>{{ values.city_or_territory }}</b>{% endif %}
+      {% if values.neighborhood %}<b>{{ values.neighborhood }}</b>{% endif %}
+      {% if values.maximum_budget %}<b>≤ {{ values.maximum_budget }} FC</b>{% endif %}
+      {% if values.minimum_bedrooms %}<b>{{ values.minimum_bedrooms }}+ chambres</b>{% endif %}
+      {% if values.minimum_living_rooms %}<b>{{ values.minimum_living_rooms }}+ salons</b>{% endif %}
+    </div>
+
+    <div class="matching-grid">
+      {% for r in results %}
+      <article class="property-result">
+        <a class="property-photo" href="{% url 'property_detail' r.property.property_id %}" aria-label="Voir {{ r.property.property_id }}">
+          {% with r.property.photos.first as photo %}
+            {% if photo %}<img src="{{ photo.image.url }}" alt="Photo du logement {{ r.property.property_id }}" loading="lazy">{% else %}<div class="photo-placeholder"><span>⌂</span><small>Photo à venir</small></div>{% endif %}
+          {% endwith %}
+          <span class="compatibility-pill"><span>✓</span> 100%</span>
+          <span class="photo-shade"></span>
+          <span class="view-chip">Voir <span>→</span></span>
+        </a>
+        <div class="property-content">
+          <div class="property-meta"><span class="property-status"><i></i> Disponible</span><span class="property-id">{{ r.property.property_id }}</span></div>
+          <h3>{{ r.property.property_type }}</h3>
+          <p class="property-location"><span>⌖</span>{{ r.property.city_or_territory }}{% if r.property.neighborhood %}<span class="separator">·</span>{{ r.property.neighborhood }}{% endif %}</p>
+          <div class="property-facts">
+            <span><strong>{{ r.property.bedroom_count }}</strong> chambre{% if r.property.bedroom_count != 1 %}s{% endif %}</span>
+            <span><strong>{{ r.property.living_room_count }}</strong> salon{% if r.property.living_room_count != 1 %}s{% endif %}</span>
+            <span><strong>{{ r.property.max_occupants }}</strong> occupant{% if r.property.max_occupants != 1 %}s{% endif %}</span>
+          </div>
+          <div class="match-confirmation"><span>✓</span><div><strong>Correspondance complète</strong><small>Tous vos critères sont respectés</small></div></div>
+          <div class="property-protection"><span>⌂</span> Loyer et adresse exacte masqués</div>
+          <div class="property-actions"><a class="primary-action" href="{% url 'property_detail' r.property.property_id %}">Voir le logement <span>→</span></a><button class="share-action" type="button" onclick="navigator.clipboard.writeText(location.origin+'/properties/{{ r.property.property_id }}/')" aria-label="Partager le logement">↗</button></div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% elif values %}
+  <section class="empty-results">
+    <div class="empty-visual"><span>⌕</span></div>
+    <span class="section-kicker">Aucun résultat</span>
+    <h2>Nous n'avons pas encore trouvé votre logement.</h2>
+    <p>Fasthome applique strictement les critères renseignés. Essayez de corriger une faute de frappe ou d'élargir un critère pour obtenir davantage de possibilités.</p>
+    <button class="secondary-action" type="button" onclick="document.getElementById('matching-form').scrollIntoView({behavior:'smooth',block:'start'})">Modifier ma recherche <span>↑</span></button>
+  </section>
+  {% endif %}
+
+  <style>
+    .matching-page{max-width:1180px;padding-top:24px;padding-bottom:120px;--fh-navy:#102b43;--fh-blue:#174f78;--fh-gold:#c89b4a;--fh-ink:#142536;--fh-muted:#718096;--fh-line:#dce5ec;--fh-soft:#f4f7fa;--fh-white:#fff}
+    .matching-page *{box-sizing:border-box}.matching-page a{text-decoration:none}.matching-page button,.matching-page input,.matching-page select{font:inherit}
+    .matching-hero{position:relative;overflow:hidden;min-height:230px;border-radius:30px;padding:42px 44px;background:linear-gradient(135deg,#0b2239 0%,#123b5c 62%,#174f78 100%);color:#fff;display:flex;align-items:center;box-shadow:0 24px 55px rgba(16,43,67,.16);isolation:isolate}
+    .matching-hero:after{content:"";position:absolute;inset:0;background:linear-gradient(120deg,transparent 45%,rgba(255,255,255,.055) 45.2%,transparent 67%);z-index:-1}.hero-content{position:relative;z-index:2;max-width:760px}.eyebrow,.section-kicker{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.eyebrow{color:#e9d4a4}.eyebrow-dot{width:7px;height:7px;border-radius:50%;background:#e0b968;box-shadow:0 0 0 5px rgba(224,185,104,.12)}
+    .hero-content h1{font-size:clamp(2rem,4vw,3.15rem);line-height:1.04;letter-spacing:-.045em;margin:14px 0 12px;max-width:690px}.hero-content p{margin:0;max-width:650px;color:rgba(255,255,255,.76);font-size:1rem;line-height:1.65}.hero-mark{position:absolute;right:52px;bottom:-22px;width:160px;height:160px;border:1px solid rgba(255,255,255,.12);border-radius:50%;display:grid;place-items:center;color:rgba(255,255,255,.08);font-size:7rem;z-index:0}.hero-mark:before,.hero-mark:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.09);border-radius:50%}.hero-mark:before{inset:18px}.hero-mark:after{inset:38px}.hero-mark small{position:absolute;font-size:1.1rem;font-weight:900;color:rgba(255,255,255,.16);bottom:48px;right:53px}.hero-orbit{position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,.09);z-index:-1}.hero-orbit-a{width:300px;height:300px;right:140px;top:-210px}.hero-orbit-b{width:470px;height:470px;right:-80px;top:-250px}
+    .matching-panel{margin-top:22px;background:var(--fh-white);border:1px solid var(--fh-line);border-radius:28px;box-shadow:0 18px 50px rgba(16,43,67,.08);overflow:hidden}.panel-heading{display:flex;align-items:center;gap:16px;padding:28px 32px 24px;background:linear-gradient(180deg,#fff,#fbfcfd);border-bottom:1px solid var(--fh-line)}.heading-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:#edf4f8;color:var(--fh-blue);font-size:1.65rem;font-weight:900}.section-kicker{color:#7890a3}.panel-heading h2{margin:3px 0 3px;font-size:1.45rem;letter-spacing:-.025em;color:var(--fh-ink)}.panel-heading p,.results-header p{margin:0;color:var(--fh-muted);font-size:.9rem}.matching-form{padding:28px 32px 30px}.criteria-group{padding:4px 0}.group-heading{display:flex;align-items:flex-start;gap:13px;margin-bottom:19px}.group-number{flex:none;width:35px;height:28px;border-radius:9px;background:#f0f4f7;color:#698094;display:grid;place-items:center;font-size:.7rem;font-weight:950;letter-spacing:.08em}.group-heading strong{display:block;color:var(--fh-ink);font-size:1rem}.group-heading small{display:block;color:#8a99a7;font-size:.78rem;margin-top:4px;line-height:1.45}.fields-grid{display:grid;gap:14px}.location-grid{grid-template-columns:repeat(4,1fr)}.feature-grid{grid-template-columns:repeat(4,1fr)}.field{min-width:0}.field label{display:block;margin:0 0 7px;color:#3d5061;font-size:.76rem;font-weight:850}.input-shell{height:50px;display:flex;align-items:center;border:1px solid #d8e1e8;background:#fbfcfd;border-radius:13px;transition:border-color .18s,box-shadow .18s,background .18s}.input-shell:focus-within{background:#fff;border-color:#2c648e;box-shadow:0 0 0 4px rgba(44,100,142,.08)}.input-icon{width:40px;flex:none;text-align:center;color:#8a9cac;font-size:1rem;font-weight:700}.input-shell input,.input-shell select{width:100%;height:100%;border:0;outline:0;background:transparent;color:var(--fh-ink);font-size:.88rem;min-width:0}.input-shell input::placeholder{color:#a9b5bf}.select-shell{position:relative}.select-shell select{appearance:none;padding-right:28px;cursor:pointer}.select-chevron{position:absolute;right:13px;color:#8191a0;pointer-events:none}.criteria-divider{height:1px;background:linear-gradient(90deg,transparent,var(--fh-line),transparent);margin:27px 0}.budget-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:end}.budget-shell{background:#fff}.input-suffix{padding-right:15px;color:#7b8c9b;font-size:.76rem;font-weight:900}.budget-note{min-height:50px;border:1px dashed #d8c69f;background:#fffcf5;border-radius:13px;padding:9px 13px;display:flex;align-items:center;gap:10px}.note-icon{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:#ead7ad;color:#6e5728;font-weight:950;font-size:.72rem}.budget-note strong{display:block;font-size:.76rem;color:#5e4d2d}.budget-note p{margin:2px 0 0;color:#8b7b5b;font-size:.71rem;line-height:1.35}.search-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-top:28px;padding-top:22px;border-top:1px solid var(--fh-line)}.privacy-line{color:#82919e;font-size:.72rem;font-weight:700}.privacy-line span{color:#5c8c71;margin-right:2px}.search-button{border:0;min-height:52px;border-radius:14px;padding:0 17px;background:linear-gradient(135deg,#0b2239,#164b7a);color:#fff;display:inline-flex;align-items:center;gap:10px;font-weight:900;font-size:.83rem;cursor:pointer;box-shadow:0 10px 24px rgba(11,34,57,.18);transition:transform .18s,box-shadow .18s}.search-button:hover{transform:translateY(-1px);box-shadow:0 13px 28px rgba(11,34,57,.22)}.search-button-icon{font-size:1.25rem}.button-arrow{font-size:1.05rem;margin-left:5px;color:#d9bd7d}
+    .results-section{margin-top:42px}.results-header{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:18px}.results-header h2{margin:4px 0 4px;color:var(--fh-ink);font-size:clamp(1.6rem,3vw,2.2rem);letter-spacing:-.04em}.result-quality{display:flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid #dce7df;background:#f7fbf8;border-radius:14px}.quality-check{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#dceee2;color:#4c8a61;font-weight:950}.result-quality strong{display:block;color:#397052;font-size:.95rem}.result-quality small{display:block;color:#7a8e83;font-size:.65rem}.criteria-summary{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:16px;padding:10px 12px;border:1px solid var(--fh-line);background:#fafcfd;border-radius:13px}.criteria-summary span{font-size:.69rem;color:#7c8e9d;font-weight:900;text-transform:uppercase;letter-spacing:.08em;margin-right:3px}.criteria-summary b{font-size:.7rem;color:#486072;background:#eef3f6;border-radius:999px;padding:6px 9px;font-weight:800}
+    .matching-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.property-result{min-width:0;background:#fff;border:1px solid var(--fh-line);border-radius:22px;overflow:hidden;box-shadow:0 12px 32px rgba(16,43,67,.06);transition:transform .2s,box-shadow .2s,border-color .2s}.property-result:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(16,43,67,.1);border-color:#cbd9e3}.property-photo{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;background:#edf2f5}.property-photo img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .45s}.property-result:hover .property-photo img{transform:scale(1.035)}.photo-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,22,35,.05),transparent 48%,rgba(5,22,35,.36));pointer-events:none}.compatibility-pill{position:absolute;left:13px;top:13px;z-index:2;padding:7px 10px;border-radius:999px;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);color:#3f7955;font-size:.68rem;font-weight:950;box-shadow:0 6px 16px rgba(0,0,0,.08)}.compatibility-pill span{margin-right:3px}.view-chip{position:absolute;right:13px;bottom:13px;z-index:2;padding:7px 10px;border-radius:999px;background:rgba(16,43,67,.84);backdrop-filter:blur(10px);color:#fff;font-size:.68rem;font-weight:850}.view-chip span{margin-left:5px;color:#e4c98d}.photo-placeholder{height:100%;display:grid;place-items:center;align-content:center;gap:4px;color:#8293a1;background:linear-gradient(145deg,#edf3f6,#f8fafb)}.photo-placeholder span{font-size:2.2rem;color:#9aacb9}.photo-placeholder small{font-size:.68rem}.property-content{padding:17px 18px 18px}.property-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}.property-status{display:inline-flex;align-items:center;gap:6px;color:#4c7d5c;font-size:.68rem;font-weight:900}.property-status i{width:7px;height:7px;border-radius:50%;background:#6ca87d}.property-id{font-size:.62rem;color:#9aa8b3;letter-spacing:.04em}.property-content h3{margin:0;color:var(--fh-ink);font-size:1.2rem;letter-spacing:-.025em}.property-location{margin:6px 0 13px;color:#6e8190;font-size:.78rem;display:flex;align-items:center;gap:6px}.property-location>span:first-child{color:#9aa9b5}.separator{color:#b2bec7}.property-facts{display:flex;flex-wrap:wrap;gap:6px;padding-bottom:14px;border-bottom:1px solid #e9eef2}.property-facts span{padding:7px 9px;border-radius:10px;background:#f4f7f9;color:#728392;font-size:.68rem}.property-facts strong{color:#344b5d;font-size:.76rem;margin-right:2px}.match-confirmation{display:flex;align-items:center;gap:9px;margin-top:13px;padding:9px 10px;border-radius:12px;background:#f4faf6}.match-confirmation>span{width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:#dceee2;color:#4f8962;font-size:.72rem;font-weight:950}.match-confirmation strong{display:block;color:#477456;font-size:.72rem}.match-confirmation small{display:block;color:#7b9183;font-size:.65rem;margin-top:2px}.property-protection{margin:10px 0 13px;color:#8a99a5;font-size:.66rem;display:flex;align-items:center;gap:6px}.property-protection span{color:#9b6e32}.property-actions{display:flex;gap:8px}.primary-action{height:42px;flex:1;display:flex;align-items:center;justify-content:center;gap:7px;border-radius:11px;background:#102f49;color:#fff;font-size:.73rem;font-weight:900;transition:background .18s}.primary-action:hover{background:#174f78}.primary-action span{color:#d7b977}.share-action{width:42px;border:1px solid #d9e2e8;background:#fff;color:#567084;border-radius:11px;cursor:pointer;font-size:1rem}.share-action:hover{background:#f2f6f8}.empty-results{margin-top:35px;padding:50px 25px;text-align:center;background:#fff;border:1px solid var(--fh-line);border-radius:25px;box-shadow:0 12px 35px rgba(16,43,67,.05)}.empty-visual{width:70px;height:70px;margin:0 auto 17px;border-radius:22px;background:#eff4f7;color:#547187;display:grid;place-items:center;font-size:2.2rem}.empty-results .section-kicker{color:#9b6e32}.empty-results h2{max-width:550px;margin:7px auto 9px;color:var(--fh-ink);font-size:1.55rem;letter-spacing:-.03em}.empty-results p{max-width:590px;margin:0 auto 20px;color:#778895;line-height:1.6;font-size:.88rem}.secondary-action{border:1px solid #d7e1e8;background:#fff;color:#24465e;border-radius:11px;padding:11px 15px;font-size:.75rem;font-weight:900;cursor:pointer}.secondary-action span{margin-left:7px;color:#a67836}
+    @media(max-width:900px){.location-grid,.feature-grid{grid-template-columns:repeat(2,1fr)}.budget-row{grid-template-columns:1fr}.matching-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hero-mark{right:20px}.matching-hero{padding:36px}}
+    @media(max-width:650px){.matching-page{width:calc(100% - 18px);padding-top:14px;padding-bottom:105px}.matching-hero{min-height:260px;padding:30px 23px;border-radius:24px;align-items:flex-start}.hero-content h1{font-size:2rem;line-height:1.05;margin-top:13px;max-width:330px}.hero-content p{font-size:.83rem;line-height:1.6;max-width:330px}.hero-mark{width:115px;height:115px;right:-18px;bottom:-30px;font-size:5rem}.hero-orbit-a{right:-80px}.hero-orbit-b{right:-180px}.matching-panel{margin-top:13px;border-radius:21px}.panel-heading{padding:20px 17px 18px;gap:11px}.heading-icon{width:41px;height:41px;border-radius:13px;font-size:1.35rem}.panel-heading h2{font-size:1.15rem}.panel-heading p{font-size:.74rem;line-height:1.4}.matching-form{padding:20px 16px 21px}.group-heading{gap:10px;margin-bottom:14px}.group-number{width:30px;height:25px;font-size:.62rem}.group-heading strong{font-size:.88rem}.group-heading small{font-size:.68rem}.location-grid,.feature-grid{grid-template-columns:1fr;gap:11px}.field-wide{grid-column:auto}.input-shell{height:48px;border-radius:12px}.field label{font-size:.7rem;margin-bottom:6px}.input-shell input,.input-shell select{font-size:.8rem}.criteria-divider{margin:22px 0}.budget-row{gap:11px}.budget-note{min-height:auto;padding:10px}.budget-note p{font-size:.65rem}.search-footer{margin-top:22px;padding-top:18px;display:block}.privacy-line{margin-bottom:11px;font-size:.65rem}.search-button{width:100%;justify-content:center;height:51px}.results-section{margin-top:30px}.results-header{align-items:flex-start;display:block}.results-header h2{font-size:1.55rem}.results-header p{font-size:.75rem}.result-quality{position:relative;float:right;margin-top:-52px}.criteria-summary{margin-top:15px;gap:5px}.criteria-summary span{width:100%;margin-bottom:2px}.criteria-summary b{font-size:.62rem;padding:5px 8px}.matching-grid{grid-template-columns:1fr;gap:13px}.property-result{border-radius:19px}.property-photo{aspect-ratio:16/10}.property-content{padding:14px}.property-content h3{font-size:1.05rem}.property-location{font-size:.72rem}.property-facts span{font-size:.62rem;padding:6px 7px}.match-confirmation{padding:8px}.match-confirmation strong{font-size:.68rem}.property-protection{font-size:.61rem}.primary-action{height:40px;font-size:.68rem}.share-action{width:40px}.empty-results{margin-top:25px;padding:38px 18px;border-radius:21px}.empty-results h2{font-size:1.25rem}.empty-results p{font-size:.78rem}}
+    @media(prefers-reduced-motion:reduce){.property-result,.property-photo img,.search-button{transition:none!important}}
+  </style>
+</main>
+{% endblock %}

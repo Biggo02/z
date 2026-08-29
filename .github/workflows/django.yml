@@ -1,0 +1,49 @@
+name: Django CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: django-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      DJANGO_DEBUG: '0'
+      # Ephemeral CI-only value; production secrets never live in source control.
+      DJANGO_SECRET_KEY: ci-${{ github.run_id }}-${{ github.run_attempt }}
+      DJANGO_ALLOWED_HOSTS: 'localhost,127.0.0.1'
+      DJANGO_CSRF_TRUSTED_ORIGINS: 'https://localhost'
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: python -m pip install --upgrade pip
+      - run: pip install -r requirements.txt
+      - name: Validate photo upload JavaScript
+        run: node --check static/js/photo_upload.js
+      - run: python manage.py check --deploy
+      - run: python manage.py migrate --run-syncdb --noinput
+      - run: python manage.py seed_property_types
+      # The test client uses plain HTTP by default. Production HTTPS redirect
+      # remains enabled for deploy checks; disable only that redirect for tests.
+      - name: Run Django tests
+        env:
+          DJANGO_SECURE_SSL_REDIRECT: '0'
+        run: python manage.py test --noinput --verbosity 2

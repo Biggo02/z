@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Demander une visite — Fasthome{% endblock %}
+{% block content %}
+<style>
+.visit-page{max-width:760px;margin:0 auto;padding:24px 14px 48px}.visit-head{margin-bottom:18px}.visit-kicker{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:#e8f0fe;color:#2563eb;font-size:.75rem;font-weight:800}.visit-head h1{margin:12px 0 7px;color:#0b1a33;font-size:clamp(1.7rem,4vw,2.35rem);letter-spacing:-.03em}.visit-head p{margin:0;color:#64748b;line-height:1.6}.visit-card{background:#fff;border:1px solid #e8edf3;border-radius:20px;padding:22px;box-shadow:0 8px 30px rgba(11,34,57,.06);margin-bottom:14px}.property-summary{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px;border-radius:15px;background:#f8fafc;border:1px solid #edf1f5;margin-bottom:20px}.property-summary strong{display:block;color:#0b1a33;font-size:1rem}.property-summary span{display:block;color:#64748b;font-size:.78rem;margin-top:4px}.property-ref{font-size:.72rem;color:#64748b;background:#fff;border:1px solid #e2e8f0;padding:7px 9px;border-radius:999px;white-space:nowrap}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:14px}.field.full{grid-column:1/-1}.field label{display:block;color:#0b1a33;font-size:.78rem;font-weight:800;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;min-height:46px;padding:10px 13px;border:1px solid #dfe6ed;border-radius:12px;background:#fff;color:#1e293b;font:inherit;outline:0}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}.hint{margin:-5px 0 14px;color:#64748b;font-size:.72rem;line-height:1.5}.privacy{padding:13px 14px;border:1px dashed #d9e1e8;border-radius:13px;background:#f8fafc;color:#64748b;font-size:.74rem;line-height:1.5;margin-bottom:16px}.actions{display:flex;gap:10px}.btn{min-height:46px;padding:11px 18px;border-radius:12px;border:1px solid transparent;font:inherit;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}.btn-primary{flex:1;background:#2563eb;color:#fff}.btn-light{background:#fff;color:#475569;border-color:#cbd5e1}.btn-primary:hover{background:#1d4ed8}.btn:focus-visible{outline:3px solid rgba(37,99,235,.2);outline-offset:2px}@media(max-width:600px){.visit-page{padding:14px 10px 34px}.visit-card{padding:15px;border-radius:17px}.property-summary{align-items:flex-start;flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.actions{display:grid;grid-template-columns:1fr}.actions .btn{width:100%}}
+</style>
+<main class="visit-page">
+  <header class="visit-head">
+    <span class="visit-kicker">📅 Demande de visite</span>
+    <h1>Organiser une visite</h1>
+    <p>Choisissez une date et, si vous le souhaitez, un créneau. Votre demande est transmise à Fasthome pour traitement.</p>
+  </header>
+
+  <section class="visit-card">
+    <div class="property-summary">
+      <div>
+        <strong>{{ property.property_type }}</strong>
+        <span>{{ property.city_or_territory }}{% if property.neighborhood %} · {{ property.neighborhood }}{% endif %}</span>
+      </div>
+      <span class="property-ref">Réf. {{ property.property_id }}</span>
+    </div>
+
+    <form method="post" action="{% url 'request_visit' property.property_id %}">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="field">
+          <label for="requested_date">Date souhaitée</label>
+          <input id="requested_date" name="requested_date" type="date" required min="{{ today|date:'Y-m-d' }}">
+        </div>
+        <div class="field">
+          <label for="requested_time_slot">Créneau souhaité <span style="font-weight:500;color:#94a3b8">(facultatif)</span></label>
+          <select id="requested_time_slot" name="requested_time_slot">
+            <option value="">Je n’ai pas de préférence</option>
+            <option value="Matin · 08h00–10h00">Matin · 08h00–10h00</option>
+            <option value="Matin · 10h00–12h00">Matin · 10h00–12h00</option>
+            <option value="Après-midi · 14h00–16h00">Après-midi · 14h00–16h00</option>
+            <option value="Après-midi · 16h00–18h00">Après-midi · 16h00–18h00</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="visit_comment">Commentaire <span style="font-weight:500;color:#94a3b8">(facultatif)</span></label>
+          <textarea id="visit_comment" name="visit_comment" maxlength="500" placeholder="Une précision utile pour Fasthome…"></textarea>
+        </div>
+      </div>
+      <p class="hint">La date doit être aujourd’hui ou ultérieure. Fasthome vous informera de la décision concernant votre demande.</p>
+      <div class="privacy">🔒 <strong>Parcours Fasthome :</strong> vous ne contactez pas directement le propriétaire. Fasthome organise et encadre la demande de visite.</div>
+      <div class="actions">
+        <a class="btn btn-light" href="{% url 'property_detail' property.property_id %}">← Retour</a>
+        <button class="btn btn-primary" type="submit">✓ Confirmer ma demande</button>
+      </div>
+    </form>
+  </section>
+</main>
+{% endblock %}

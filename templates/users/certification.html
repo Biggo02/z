@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block title %}Certification — Fasthome{% endblock %}
+{% block content %}
+<style>
+.cert-page{max-width:760px;margin:0 auto;padding:8px 0 40px;color:#1e293b;font-family:'Inter',sans-serif}
+.cert-page *{box-sizing:border-box}
+.cert-header{background:#fff;border:1px solid #edf2f7;border-radius:20px;padding:22px 24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.cert-title{display:flex;align-items:center;gap:14px}
+.cert-icon{width:48px;height:48px;border-radius:14px;background:#e8f0fe;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:21px}
+.cert-header h1{font-size:21px;line-height:1.2;color:#0b1a33;margin:0;font-weight:700}
+.cert-header p{font-size:13px;color:#64748b;margin:5px 0 0}
+.cert-status{padding:7px 12px;border-radius:40px;background:#f1f5f9;color:#64748b;font-size:12px;font-weight:600;white-space:nowrap}
+.cert-card{background:#fff;border:1px solid #edf2f7;border-radius:20px;padding:24px;margin-bottom:20px}
+.cert-intro{font-size:14px;color:#64748b;line-height:1.6;margin-bottom:20px}
+.cert-notice{padding:15px 16px;border-radius:14px;border:1px solid #e2e8f0;margin:0 0 20px;font-size:14px;line-height:1.55}
+.cert-notice strong{display:block;color:#0b1a33;margin-bottom:4px}
+.cert-notice p{margin:4px 0 0;color:#64748b}
+.cert-info{background:#f8fafc}.cert-success{background:#f0fdf4;border-color:#bbf7d0}.cert-warning{background:#fffbeb;border-color:#fde68a}
+.cert-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cert-field{border:1px solid #e2e8f0;border-radius:16px;padding:16px;background:#fff;transition:.2s}
+.cert-field:focus-within{border-color:#93c5fd;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.cert-field.full{grid-column:1/-1}
+.cert-field-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cert-field-icon{width:34px;height:34px;border-radius:10px;background:#f1f5f9;color:#2563eb;display:flex;align-items:center;justify-content:center}
+.cert-field label{font-size:14px;font-weight:600;color:#0b1a33;display:block;margin:0}
+.cert-field input[type=file]{width:100%;font-size:13px;color:#64748b;border:1px dashed #cbd5e1;border-radius:12px;padding:12px;background:#f8fafc;cursor:pointer}
+.cert-field small{display:block;color:#94a3b8;font-size:11px;line-height:1.45;margin-top:8px}
+.cert-errors{color:#dc2626;font-size:12px;margin-top:6px}
+.cert-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:20px}
+.cert-btn{border:0;border-radius:40px;background:#2563eb;color:#fff;padding:11px 20px;font-weight:600;font-size:14px;cursor:pointer;transition:.2s}
+.cert-btn:hover{background:#1d4ed8}.cert-btn:disabled{opacity:.65;cursor:wait}
+.upload-status{margin-top:18px;padding:15px;border:1px solid #dbe3eb;border-radius:14px;background:#f8fafc}
+.upload-status-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:9px;font-size:13px}
+.upload-progress{height:9px;border-radius:999px;background:#e4e9ef;overflow:hidden}
+.upload-progress span{display:block;width:0;height:100%;border-radius:999px;background:#2563eb;transition:width .15s ease}
+.upload-status p{margin:8px 0 0;font-size:12px;color:#64748b}
+.cert-summary{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+.cert-summary-item{flex:1;min-width:150px;background:#f8fafc;border-radius:14px;padding:13px}
+.cert-summary-item i{color:#2563eb;margin-right:6px}.cert-summary-item span{font-size:12px;color:#64748b}
+@media(max-width:700px){.cert-page{padding:0 0 24px}.cert-header{padding:18px;align-items:flex-start}.cert-header h1{font-size:18px}.cert-status{display:none}.cert-card{padding:18px;border-radius:18px}.cert-fields{grid-template-columns:1fr}.cert-field.full{grid-column:auto}.cert-actions{flex-direction:column;align-items:stretch}.cert-btn{width:100%}}
+</style>
+
+<main class="cert-page">
+  <header class="cert-header">
+    <div class="cert-title">
+      <div class="cert-icon"><i class="fas fa-shield-alt"></i></div>
+      <div>
+        <h1>Certification du compte</h1>
+        <p>Vérification d'identité Fasthome</p>
+      </div>
+    </div>
+    {% if fully_certified %}<span class="cert-status" style="background:#d1fae5;color:#059669">Certifié ✓</span>{% elif verification %}<span class="cert-status">{{ verification.get_status_display }}</span>{% endif %}
+  </header>
+
+  <section class="cert-card">
+    <p class="cert-intro">Certifiez votre identité pour renforcer la confiance sur Fasthome. Vos documents sont traités dans le cadre du processus de vérification et votre photo faciale validée pourra devenir votre photo de profil.</p>
+
+    {% if verification %}
+      <div class="cert-summary">
+        <div class="cert-summary-item"><i class="fas fa-id-card"></i><span>Document : <strong>{{ verification.get_status_display }}</strong></span></div>
+        <div class="cert-summary-item"><i class="fas fa-user-check"></i><span>Visage : <strong>{{ verification.get_facial_status_display }}</strong></span></div>
+      </div>
+
+      {% if fully_certified %}
+        <div class="cert-notice cert-success"><strong><i class="fas fa-check-circle"></i> Identité vérifiée</strong><p>Votre photo faciale validée est utilisée comme photo de profil. Aucun nouvel envoi n'est nécessaire.</p></div>
+      {% elif facial_retry %}
+        <div class="cert-notice cert-warning"><strong><i class="fas fa-camera"></i> Nouvelle vérification faciale nécessaire</strong><p>Votre pièce d’identité reste validée, mais la vérification faciale a été refusée. Vous n’avez pas besoin de renvoyer votre pièce d’identité : envoyez simplement une nouvelle photo faciale nette.</p>{% if verification.rejection_reason %}<p><strong>Motif :</strong> {{ verification.rejection_reason }}</p>{% endif %}</div>
+      {% elif verification.status == 'PENDING' or verification.status == 'IN_REVIEW' %}
+        <div class="cert-notice cert-info"><strong><i class="fas fa-clock"></i> Dossier déjà transmis</strong><p>Votre document et votre photo faciale sont en cours de traitement. Un second envoi est bloqué pendant la vérification.</p></div>
+      {% elif verification.status == 'REJECTED' or verification.status == 'RETRY' %}
+        <div class="cert-notice cert-warning"><strong><i class="fas fa-exclamation-triangle"></i> Dossier à refaire</strong><p>Vous pouvez envoyer une nouvelle pièce et une nouvelle photo faciale.</p>{% if verification.rejection_reason %}<p><strong>Motif :</strong> {{ verification.rejection_reason }}</p>{% endif %}</div>
+      {% endif %}
+    {% endif %}
+
+    {% if not fully_certified %}
+      {% if not verification or verification.status == 'REJECTED' or verification.status == 'RETRY' or facial_retry %}
+        <form id="identity-form" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="cert-fields">
+            {% for field in form %}
+              <div class="cert-field {% if field.name == 'facial_photo' %}full{% endif %}">
+                <div class="cert-field-head">
+                  <div class="cert-field-icon"><i class="fas {% if field.name == 'facial_photo' %}fa-camera{% else %}fa-id-card{% endif %}"></i></div>
+                  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                </div>
+                {{ field }}
+                {% if field.name == 'facial_photo' %}<small>Photo nette, visage visible, sans filtre. Sur téléphone, l'appareil photo avant peut être proposé automatiquement.</small>{% else %}<small>Formats et taille finale contrôlés également par le serveur.</small>{% endif %}
+                {% if field.errors %}<div class="cert-errors">{{ field.errors }}</div>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+
+          <div id="upload-status" class="upload-status" hidden aria-live="polite">
+            <div class="upload-status-head"><strong id="upload-title">Préparation des fichiers…</strong><span id="upload-percent">0 %</span></div>
+            <div class="upload-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="upload-progress-bar"></span></div>
+            <p id="upload-detail">Les photos sont traitées une par une et compressées avant l'envoi pour limiter l'utilisation de mémoire.</p>
+          </div>
+
+          <div class="cert-actions">
+            <span style="font-size:12px;color:#94a3b8"><i class="fas fa-lock"></i> Transmission sécurisée</span>
+            <button id="upload-button" class="cert-btn" type="submit"><i class="fas fa-paper-plane"></i> {% if facial_retry %}Renvoyer la photo faciale{% else %}Envoyer pour vérification{% endif %}</button>
+          </div>
+        </form>
+      {% endif %}
+    {% endif %}
+  </section>
+</main>
+
+{% if not fully_certified %}
+  {% if not verification or verification.status == 'REJECTED' or verification.status == 'RETRY' or facial_retry %}
+<script>
+(() => {
+  'use strict';
+  const form=document.getElementById('identity-form');
+  const button=document.getElementById('upload-button');
+  const status=document.getElementById('upload-status');
+  const title=document.getElementById('upload-title');
+  const percent=document.getElementById('upload-percent');
+  const detail=document.getElementById('upload-detail');
+  const bar=document.getElementById('upload-progress-bar');
+  const progress=status?.querySelector('[role="progressbar"]');
+  if(!form||!button||!status||!progress)return;
+
+  const MAX_DIMENSION=1400;
+  const TARGET_BYTES=1.5*1024*1024;
+  const HARD_INPUT_BYTES=8*1024*1024;
+  const imageTypes=new Set(['image/jpeg','image/png','image/webp']);
+  const inputs=[document.getElementById('id_document_file'),document.getElementById('id_facial_photo')].filter(Boolean);
+  let submitting=false;
+
+  function setProgress(v,msg){const n=Math.max(0,Math.min(100,Math.round(v)));bar.style.width=n+'%';percent.textContent=n+' %';progress.setAttribute('aria-valuenow',String(n));if(msg)detail.textContent=msg;}
+  function formatSize(b){return b<1048576?Math.max(1,Math.round(b/1024))+' Ko':(b/1048576).toFixed(1)+' Mo'}
+  function yieldToBrowser(){return new Promise(resolve=>setTimeout(resolve,0))}
+  function loadImage(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file);const img=new Image();img.decoding='async';img.onload=()=>{URL.revokeObjectURL(url);resolve(img)};img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('Cette image ne peut pas être lue. Essayez une autre photo.'))};img.src=url;})}
+  function canvasToBlob(canvas,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Compression impossible.')),'image/jpeg',quality))}
+  async function compressImage(file){
+    if(!imageTypes.has(file.type))return file;
+    if(file.size>HARD_INPUT_BYTES)throw new Error(`La photo originale est trop volumineuse (${formatSize(file.size)}). Choisissez une photo plus légère.`);
+    if(file.type==='image/jpeg'&&file.size<=TARGET_BYTES)return file;
+    await yieldToBrowser();
+    const img=await loadImage(file);
+    const longest=Math.max(img.naturalWidth||img.width,img.naturalHeight||img.height);
+    const scale=Math.min(1,MAX_DIMENSION/Math.max(1,longest));
+    const width=Math.max(1,Math.round((img.naturalWidth||img.width)*scale));
+    const height=Math.max(1,Math.round((img.naturalHeight||img.height)*scale));
+    const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext('2d',{alpha:false,desynchronized:true});
+    if(!ctx){canvas.width=canvas.height=1;throw new Error('Le navigateur ne peut pas préparer cette image.')}
+    ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='medium';ctx.drawImage(img,0,0,width,height);img.src='';await yieldToBrowser();
+    let blob=await canvasToBlob(canvas,.76);if(blob.size>TARGET_BYTES)blob=await canvasToBlob(canvas,.64);if(blob.size>TARGET_BYTES)blob=await canvasToBlob(canvas,.52);canvas.width=canvas.height=1;
+    if(blob.size>=file.size&&file.type==='image/jpeg')return file;
+    return new File([blob],(file.name.replace(/\.[^.]+$/,'')||'image')+'.jpg',{type:'image/jpeg',lastModified:Date.now()});
+  }
+  function replaceFile(input,file){const dt=new DataTransfer();dt.items.add(file);input.files=dt.files}
+
+  form.addEventListener('submit',async e=>{
+    e.preventDefault();if(submitting)return;submitting=true;button.disabled=true;status.hidden=false;setProgress(0,'Préparation des fichiers…');
+    try{
+      let processed=0;const selected=inputs.filter(input=>input.files&&input.files.length);
+      if(!selected.length){submitting=false;button.disabled=false;form.submit();return;}
+      for(const input of selected){
+        const original=input.files[0];const label=input.id==='id_facial_photo'?'photo faciale':'pièce d’identité';title.textContent=`Préparation de la ${label}…`;setProgress(processed*25,`Fichier original : ${formatSize(original.size)}`);
+        if(imageTypes.has(original.type)){const optimized=await compressImage(original);replaceFile(input,optimized);detail.textContent=`${formatSize(original.size)} → ${formatSize(optimized.size)}. Image optimisée.`}
+        else if(original.size>HARD_INPUT_BYTES)throw new Error(`Le fichier « ${label} » dépasse 8 Mo. Choisissez un fichier plus léger.`);
+        processed++;setProgress(25+processed*25,'Fichiers préparés.');await yieldToBrowser();
+      }
+      title.textContent='Téléversement sécurisé…';const xhr=new XMLHttpRequest();xhr.open('POST',form.action||window.location.href,true);xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+      xhr.upload.addEventListener('progress',e=>{if(!e.lengthComputable)return;const p=Math.round(e.loaded/e.total*100);setProgress(50+p*.5,p>=100?'Fichiers reçus…':`Téléversement : ${p} %`)});
+      xhr.addEventListener('load',()=>{if(xhr.status>=200&&xhr.status<400){setProgress(100,'Dossier reçu. Votre certification est maintenant en cours de vérification.');title.textContent='Dossier envoyé ✓';window.location.assign(xhr.responseURL||window.location.href);return}submitting=false;button.disabled=false;title.textContent='Échec du téléversement';setProgress(0,xhr.status===403?'Session expirée. Rechargez la page.':'Le serveur a refusé les fichiers. Vérifiez-les puis réessayez.')});
+      xhr.addEventListener('error',()=>{submitting=false;button.disabled=false;title.textContent='Connexion interrompue';setProgress(0,'Le téléversement a échoué. Vous pouvez réessayer.')});
+      xhr.addEventListener('abort',()=>{submitting=false;button.disabled=false;title.textContent='Téléversement annulé';setProgress(0,'Vous pouvez réessayer.')});
+      xhr.send(new FormData(form));
+    }catch(err){console.error(err);submitting=false;button.disabled=false;title.textContent='Préparation impossible';setProgress(0,err.message||'Impossible de préparer les images.')}
+  });
+})();
+</script>
+  {% endif %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}Mon Espace · Fasthome{% endblock %}
+{% block content %}
+<style>
+/* DeepSeek UI adapted to the existing Django backend. No business logic is implemented here. */
+.fh-space{--fh-blue:#2563eb;--fh-blue-soft:#e8f0fe;--fh-bg:#f4f6fa;--fh-text:#0b1a33;--fh-muted:#64748b;--fh-border:#edf2f7;min-height:calc(100vh - 70px);background:var(--fh-bg);color:var(--fh-text)}
+.fh-shell{display:flex;min-height:calc(100vh - 70px)}
+.fh-sidebar{width:260px;background:#fff;border-right:1px solid var(--fh-border);padding:28px 18px;display:flex;flex-direction:column;min-height:calc(100vh - 70px);position:sticky;top:70px;flex-shrink:0}
+.fh-brand{display:flex;align-items:center;gap:10px;margin-bottom:32px}.fh-brand-icon{font-size:28px;color:var(--fh-blue);background:var(--fh-blue-soft);padding:10px;border-radius:14px}.fh-brand h1{font-size:24px;font-weight:700;color:var(--fh-text);margin:0}.fh-brand h1 span{color:var(--fh-blue)}
+.fh-sidebar nav{display:flex;flex-direction:column;gap:4px;flex:1}.fh-sidebar a{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:12px;color:var(--fh-muted);font-weight:500;font-size:14px;text-decoration:none;transition:.2s}.fh-sidebar a:hover{background:#f1f5f9;color:var(--fh-text)}.fh-sidebar a.active{background:var(--fh-blue-soft);color:var(--fh-blue);font-weight:600}.fh-sidebar a i{width:22px;font-size:18px;text-align:center}.fh-bottom-links{margin-top:auto;border-top:1px solid var(--fh-border);padding-top:20px}
+.fh-main{flex:1;padding:24px 32px 60px;min-width:0}.fh-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;background:#fff;padding:12px 24px;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.02)}.fh-page-title h2{font-size:20px;font-weight:700;color:var(--fh-text);margin:0}.fh-page-title p{color:var(--fh-muted);font-size:13px;margin:3px 0 0}.fh-user-actions{display:flex;gap:12px;align-items:center}.fh-icon-btn{position:relative;background:none;border:0;font-size:18px;color:var(--fh-muted);cursor:pointer;width:40px;height:40px;border-radius:40px;text-decoration:none;display:flex;align-items:center;justify-content:center}.fh-icon-btn:hover{background:#f1f5f9}.fh-avatar{width:40px;height:40px;background:var(--fh-blue);color:#fff;border-radius:40px;display:flex;align-items:center;justify-content:center;font-weight:600}.fh-notif-dot{position:absolute;top:3px;right:3px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#ef4444;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.fh-welcome{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}.fh-welcome h2{font-size:28px;font-weight:700;color:var(--fh-text);margin:0}.fh-smiley{background:#f1f5f9;padding:6px 16px 6px 14px;border-radius:40px;font-weight:500;font-size:16px}.fh-smiley i{color:#f59e0b;margin-right:6px}.fh-subhead{font-size:15px;color:var(--fh-muted);margin:0 0 24px}
+.fh-section-head{display:flex;justify-content:space-between;align-items:center;margin:20px 0 14px}.fh-section-head h3{font-size:18px;font-weight:600;margin:0}.fh-section-head a{color:var(--fh-blue);font-weight:500;font-size:14px;text-decoration:none}.fh-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.fh-card{background:#fff;border-radius:20px;padding:20px 24px;border:1px solid var(--fh-border)}
+.fh-quick{background:#f8fafc;border-radius:18px;padding:18px 16px;border:1px solid transparent;text-align:center;text-decoration:none;color:inherit;display:block;transition:.2s}.fh-quick:hover{background:#f1f5f9;border-color:#e2e8f0;transform:translateY(-1px)}.fh-quick .icon{font-size:22px;background:var(--fh-blue-soft);color:var(--fh-blue);width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px}.fh-quick .icon.orange{background:#fef3c7;color:#d97706}.fh-quick .icon.green{background:#d1fae5;color:#059669}.fh-quick .icon.purple{background:#ede9fe;color:#7c3aed}.fh-quick h4{font-size:15px;font-weight:600;color:var(--fh-text);margin:0}.fh-quick p{font-size:13px;color:var(--fh-muted);margin:3px 0 0}
+.fh-journey{margin:20px 0 24px}.fh-journey-head{display:flex;justify-content:space-between;align-items:center}.fh-journey-head h3{font-size:17px;font-weight:600;margin:0}.fh-journey-head a{color:var(--fh-blue);text-decoration:none;font-size:14px}.fh-steps{display:flex;gap:12px;margin-top:12px;flex-wrap:wrap}.fh-step{flex:1;text-align:center;background:#f8fafc;padding:12px;border-radius:16px;min-width:60px}.fh-step .circle{width:36px;height:36px;margin:0 auto 4px;background:#fff;border:2px solid #e2e8f0;border-radius:40px;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#94a3b8}.fh-step.active .circle{background:var(--fh-blue);border-color:var(--fh-blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.25)}.fh-step .label{font-size:11px;font-weight:500;color:var(--fh-muted)}.fh-step .count{font-size:12px;font-weight:600;color:#94a3b8}.fh-step.active .count{color:var(--fh-blue)}
+.fh-stat{background:#fff;border-radius:16px;padding:18px 20px;border:1px solid var(--fh-border);text-align:center}.fh-stat .num{font-size:32px;font-weight:700;color:var(--fh-text)}.fh-stat .label{font-size:14px;color:var(--fh-muted)}.fh-stat .sub{font-size:12px;color:#94a3b8}.fh-badge{display:inline-block;padding:3px 12px;border-radius:40px;font-size:11px;font-weight:600;background:#f1f5f9;margin-top:6px}
+.fh-owner-requests{margin:0 0 22px}.fh-request{background:#fff;border:1px solid var(--fh-border);border-radius:16px;padding:14px 16px;display:flex;gap:12px;margin-top:10px}.fh-request-dot{width:9px;height:9px;border-radius:50%;background:var(--fh-blue);margin-top:7px;flex-shrink:0}.fh-request-main{flex:1;min-width:0}.fh-request-top{display:flex;gap:10px;align-items:center}.fh-spacer{flex:1}.fh-status{background:#f1f5f9;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600}.fh-muted{color:var(--fh-muted)}.fh-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.fh-btn{display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;border-radius:10px;padding:8px 13px;text-decoration:none;cursor:pointer;font-weight:600;font-size:13px}.fh-btn-primary{background:var(--fh-blue);color:#fff}.fh-btn-light{background:#f8fafc;color:var(--fh-text);border-color:#e2e8f0}
+.fh-details{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.fh-detail-card{background:#fff;border-radius:20px;padding:20px 24px;border:1px solid var(--fh-border)}.fh-detail-card h3{margin:0 0 14px;font-size:16px}.fh-detail-item{padding:10px 0;border-bottom:1px solid #f1f5f9}.fh-detail-item:last-child{border-bottom:0}.fh-empty{color:#94a3b8;font-size:13px;margin:0}.fh-manage{margin-top:20px}.fh-manage-row{display:flex;align-items:center;gap:15px}.fh-manage-row h3{margin:0;font-size:16px}.fh-manage-row p{margin:5px 0 0;color:var(--fh-muted);font-size:13px}
+@media(max-width:992px){.fh-sidebar{display:none}.fh-main{padding:16px 14px 90px}.fh-grid-4{grid-template-columns:1fr 1fr}.fh-details{grid-template-columns:1fr}}
+@media(max-width:600px){.fh-topbar{padding:10px 14px;border-radius:16px}.fh-page-title p{display:none}.fh-welcome{flex-direction:column;align-items:flex-start;gap:8px}.fh-welcome h2{font-size:24px}.fh-smiley{font-size:14px}.fh-grid-4{grid-template-columns:1fr}.fh-steps{flex-wrap:wrap}.fh-step{flex:0 0 45%}.fh-manage-row{align-items:flex-start;flex-direction:column}.fh-request-top{align-items:flex-start;flex-direction:column}.fh-request-top .fh-spacer{display:none}}
+</style>
+
+<div class="fh-space">
+  <div class="fh-shell">
+    <aside class="fh-sidebar" aria-label="Navigation Mon Espace">
+      <div class="fh-brand"><i class="fas fa-home fh-brand-icon"></i><h1>Fast<span>home</span></h1></div>
+      <nav>
+        <a href="{% url 'activity' %}" class="active"><i class="fas fa-th-large"></i>Accueil</a>
+        <a href="{% url 'matching' %}"><i class="fas fa-search"></i>Recherche</a>
+        <a href="{% url 'property_create' %}"><i class="fas fa-plus-circle"></i>Publier</a>
+        <a href="{% url 'my_properties' %}"><i class="fas fa-building"></i>Mes logements</a>
+        <a href="{% url 'favorites' %}"><i class="fas fa-heart"></i>Favoris</a>
+        <a href="{% url 'notifications' %}"><i class="fas fa-bell"></i>Notifications{% if notification_unread_count %}<span class="fh-status" style="margin-left:auto">{{ notification_unread_count }}</span>{% endif %}</a>
+      </nav>
+      <div class="fh-bottom-links">
+        {% if request.user.is_staff %}<a href="{% url 'office_dashboard' %}"><i class="fas fa-user-tie"></i>Espace Fasthome</a>{% endif %}
+        <a href="{% url 'profile' %}"><i class="fas fa-user-cog"></i>Mon profil</a>
+      </div>
+    </aside>
+
+    <main class="fh-main">
+      <div class="fh-topbar">
+        <div class="fh-page-title"><h2>Mon Espace</h2><p>Gérez vos locations en toute confiance</p></div>
+        <div class="fh-user-actions">
+          <a class="fh-icon-btn" href="{% url 'notifications' %}" aria-label="Notifications"><i class="far fa-bell"></i>{% if notification_unread_count %}<span class="fh-notif-dot">{{ notification_unread_count }}</span>{% endif %}</a>
+          <a class="fh-icon-btn" href="{% url 'activity' %}" aria-label="Mon activité"><i class="far fa-comment-dots"></i></a>
+          <a href="{% url 'profile' %}" class="fh-avatar" aria-label="Mon profil">{% if request.user.first_name or request.user.last_name %}{{ request.user.first_name|slice:':1' }}{{ request.user.last_name|slice:':1' }}{% else %}{{ request.user.username|slice:':2'|upper }}{% endif %}</a>
+        </div>
+      </div>
+
+      <div class="fh-welcome">
+        <h2>Mon Espace</h2>
+        <div class="fh-smiley"><i class="fas fa-face-smile"></i>Tout va bien, même ?</div>
+      </div>
+      <p class="fh-subhead">Visites, dossiers, paiements et logements, tout est à portée de main.</p>
+
+      <div class="fh-section-head"><h3>Accès rapides</h3><a href="{% url 'activity' %}">Voir tout <i class="fas fa-chevron-right" style="font-size:10px"></i></a></div>
+      <div class="fh-grid-4">
+        <a class="fh-quick" href="{% url 'matching' %}"><div class="icon"><i class="fas fa-search"></i></div><h4>Nouvelle recherche</h4><p>Trouvez le logement idéal</p></a>
+        <a class="fh-quick" href="{% url 'my_properties' %}"><div class="icon orange"><i class="fas fa-building"></i></div><h4>Mes logements</h4><p>Gérez vos annonces</p></a>
+        <a class="fh-quick" href="{% url 'favorites' %}"><div class="icon green"><i class="fas fa-heart"></i></div><h4>Mes favoris</h4><p>Vos coups de cœur</p></a>
+        <a class="fh-quick" href="{% url 'notifications' %}"><div class="icon purple"><i class="fas fa-bell"></i></div><h4>Notifications</h4><p>{{ notification_unread_count|default:'0' }} information{{ notification_unread_count|pluralize }} à consulter</p></a>
+      </div>
+
+      {% if landlord_visit_requests %}
+      <section class="fh-owner-requests">
+        <div class="fh-section-head"><div><h3>Demandes de visite</h3><p class="fh-muted" style="margin:4px 0 0;font-size:13px">L'identité du demandeur reste masquée.</p></div></div>
+        {% for v in landlord_visit_requests %}
+        <article class="fh-request">
+          <div class="fh-request-dot"></div><div class="fh-request-main">
+            <div class="fh-request-top"><strong>Visite {{ v.visit_id }}</strong><span class="fh-spacer"></span><span class="fh-status">{{ v.get_status_display }}</span></div>
+            <p style="margin:7px 0 3px">{{ v.property.property_id }} · {{ v.requested_date|date:"d/m/Y" }}{% if v.requested_time_slot %} · {{ v.requested_time_slot }}{% endif %}</p>
+            <p class="fh-muted" style="margin:0;font-size:12px">Votre validation : {% if v.landlord_approved %}✓ Acceptée{% else %}En attente{% endif %} · Fasthome : {% if v.fasthome_approved %}✓ Acceptée{% else %}En attente{% endif %}</p>
+            {% if v.status == 'CONFIRMED' %}<p class="fh-muted" style="margin:7px 0 0"><strong>✓ Visite confirmée.</strong> Les deux validations sont enregistrées.</p>{% elif not v.landlord_approved %}<div class="fh-actions"><form method="post" action="{% url 'landlord_visit_decision' v.visit_id %}">{% csrf_token %}<input type="hidden" name="action" value="approve"><button class="fh-btn fh-btn-primary" type="submit">✓ Accepter</button></form><form method="post" action="{% url 'landlord_visit_decision' v.visit_id %}">{% csrf_token %}<input type="hidden" name="action" value="refuse"><button class="fh-btn fh-btn-light" type="submit">✕ Refuser</button></form></div>{% else %}<p class="fh-muted" style="margin:8px 0 0">Votre décision est enregistrée. Fasthome doit encore valider.</p>{% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+      {% endif %}
+
+      <section class="fh-card fh-journey">
+        <div class="fh-journey-head"><h3>Mon parcours de location</h3><a href="#parcours">Voir détails</a></div>
+        <div class="fh-steps">
+          <div class="fh-step active"><div class="circle">1</div><div class="label">Demandes</div><div class="count">{{ visits|length }}</div></div>
+          <div class="fh-step"><div class="circle">2</div><div class="label">En attente</div><div class="count">{{ cases|length }}</div></div>
+          <div class="fh-step"><div class="circle">3</div><div class="label">Visites</div><div class="count">{{ visits|length }}</div></div>
+          <div class="fh-step"><div class="circle">4</div><div class="label">Décisions</div><div class="count">{{ cases|length }}</div></div>
+          <div class="fh-step"><div class="circle">5</div><div class="label">Contrats</div><div class="count">{{ leases|length }}</div></div>
+        </div>
+      </section>
+
+      <div class="fh-section-head"><h3>Aperçu rapide</h3></div>
+      <div class="fh-grid-4">
+        <div class="fh-stat"><div class="num">{{ visits|length }}</div><div class="label">Visites</div><div class="sub">Demandes enregistrées</div><div class="fh-badge"><i class="far fa-clock"></i> En cours</div></div>
+        <div class="fh-stat"><div class="num">{{ properties|length }}</div><div class="label">Logements</div><div class="sub">Dans votre espace</div><div class="fh-badge"><i class="fas fa-circle" style="color:#22c55e;font-size:8px"></i> Suivis</div></div>
+        <div class="fh-stat"><div class="num">{{ cases|length }}</div><div class="label">Dossiers</div><div class="sub">Suivis par Fasthome</div><div class="fh-badge"><i class="fas fa-file-alt"></i> En cours</div></div>
+        <div class="fh-stat"><div class="num">{{ leases|length }}</div><div class="label">Contrats</div><div class="sub">Locations associées</div><div class="fh-badge"><i class="fas fa-file-signature"></i> Suivis</div></div>
+      </div>
+
+      <section id="parcours" class="fh-details" style="margin-top:24px">
+        <article class="fh-detail-card"><h3><i class="fas fa-search" style="color:#2563eb;margin-right:7px"></i>Mes visites</h3>{% for v in visits %}<div class="fh-detail-item"><strong>{{ v.visit_id }}</strong><div class="fh-muted" style="font-size:12px;margin-top:3px">{{ v.get_status_display }}</div>{% if v.status == 'COMPLETED' %}<div class="fh-actions"><form method="post" action="{% url 'tenant_decision' v.visit_id %}">{% csrf_token %}<input type="hidden" name="action" value="take"><button class="fh-btn fh-btn-primary" type="submit">Prendre</button></form><form method="post" action="{% url 'tenant_decision' v.visit_id %}">{% csrf_token %}<input type="hidden" name="action" value="decline"><button class="fh-btn fh-btn-light" type="submit">Ne pas prendre</button></form></div>{% endif %}</div>{% empty %}<p class="fh-empty">Aucune visite.</p>{% endfor %}</article>
+        <article class="fh-detail-card"><h3><i class="fas fa-folder-open" style="color:#7c3aed;margin-right:7px"></i>Mes dossiers</h3>{% for c in cases %}<div class="fh-detail-item"><strong>{{ c.case_id }}</strong><div class="fh-muted" style="font-size:12px;margin-top:3px">{{ c.get_status_display }}</div></div>{% empty %}<p class="fh-empty">Aucun dossier.</p>{% endfor %}</article>
+        <article class="fh-detail-card"><h3><i class="fas fa-file-signature" style="color:#059669;margin-right:7px"></i>Contrats actifs</h3>{% for l in leases %}<div class="fh-detail-item"><a href="{% url 'lease_detail' l.lease_id %}" style="color:#2563eb;text-decoration:none"><strong>{{ l.lease_id }}</strong></a><div class="fh-muted" style="font-size:12px;margin-top:3px">{{ l.get_status_display }}</div></div>{% empty %}<p class="fh-empty">Aucune location.</p>{% endfor %}</article>
+      </section>
+
+      <section class="fh-card fh-manage"><div class="fh-manage-row"><div><h3>🏠 Mes logements</h3><p>Gestion des biens, publications, photos et demandes.</p></div><span class="fh-spacer"></span><a class="fh-btn fh-btn-primary" href="{% url 'my_properties' %}">Gérer mes logements →</a></div></section>
+    </main>
+  </div>
+</div>
+{% endblock %}

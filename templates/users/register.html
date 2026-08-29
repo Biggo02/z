@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Inscription — Fasthome{% endblock %}
+{% block content %}
+<style>
+.register-page{min-height:calc(100vh - 74px);display:flex;align-items:flex-start;justify-content:center;padding:34px 16px 70px;background:radial-gradient(circle at 50% 0%,rgba(22,75,122,.07),transparent 42%)}
+.register-card{width:min(100%,650px);background:var(--surface);border:1px solid var(--border);border-radius:26px;padding:30px;box-shadow:0 24px 70px rgba(11,34,57,.10)}
+.register-brand{display:flex;justify-content:center;margin-bottom:18px}.register-mark{width:48px;height:48px;border-radius:15px;background:linear-gradient(145deg,#0b2239,#164b7a);display:grid;place-items:center;box-shadow:0 10px 25px rgba(11,34,57,.18)}.register-mark svg{width:27px;height:27px}
+.register-head{text-align:center}.register-head h1{margin:0;color:var(--text);font-size:1.65rem;letter-spacing:-.03em}.register-head p{margin:8px 0 24px;color:var(--muted);font-size:.86rem}
+.register-errors{padding:12px 14px;border-radius:13px;background:#fff0f0;border:1px solid #f0cccc;color:#a63232;font-size:.8rem;margin-bottom:18px}.register-errors ul{margin:0;padding-left:18px}
+.register-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.register-field{min-width:0}.register-field.full{grid-column:1/-1}.register-field label{display:block;margin-bottom:7px;color:var(--text);font-size:.8rem;font-weight:800}.register-field input,.register-field select{width:100%;height:48px;padding:0 14px;border:1px solid var(--border);border-radius:13px;background:var(--surface);color:var(--text);font:inherit;font-size:.86rem;outline:none;transition:border-color .18s,box-shadow .18s}.register-field input:focus,.register-field select:focus{border-color:#246b9f;box-shadow:0 0 0 4px rgba(36,107,159,.10)}.register-field .errorlist{list-style:none;margin:6px 0 0;padding:0;color:#b52e2e;font-size:.72rem;font-weight:650}
+.register-section{grid-column:1/-1;margin-top:5px;padding-top:20px;border-top:1px solid var(--border)}.register-section-title{margin:0 0 13px;color:var(--text);font-size:.9rem;font-weight:850}
+.register-submit{width:100%;min-height:49px;margin-top:20px;border:0;border-radius:14px;background:linear-gradient(135deg,#0b2239,#164b7a);color:#fff;font:inherit;font-weight:850;cursor:pointer;box-shadow:0 12px 28px rgba(11,34,57,.18);transition:transform .18s,box-shadow .18s}.register-submit:hover{transform:translateY(-1px);box-shadow:0 15px 32px rgba(11,34,57,.23)}.register-submit:active{transform:scale(.985)}
+.register-divider{display:flex;align-items:center;gap:10px;margin:23px 0;color:var(--muted);font-size:.68rem}.register-divider:before,.register-divider:after{content:"";height:1px;background:var(--border);flex:1}.register-login{text-align:center;color:var(--muted);font-size:.8rem;margin:0}.register-login a{color:#246b9f;font-weight:850;text-decoration:none}.register-login a:hover{text-decoration:underline}.register-security{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:18px;color:var(--muted);font-size:.68rem}.register-security span{width:7px;height:7px;border-radius:50%;background:#3b8bbd;box-shadow:0 0 0 4px #dcecf5}
+@media(max-width:600px){.register-page{min-height:calc(100vh - 62px);padding:22px 10px 100px}.register-card{padding:23px 18px;border-radius:22px}.register-head h1{font-size:1.5rem}.register-grid{grid-template-columns:1fr}.register-field.full{grid-column:auto}.register-section{grid-column:auto}}
+</style>
+
+<main class="register-page">
+  <section class="register-card" aria-labelledby="register-title">
+    <div class="register-brand" aria-hidden="true">
+      <span class="register-mark"><svg viewBox="0 0 24 24" fill="none"><path d="M3 10.5 12 3l9 7.5V21h-6v-6H9v6H3v-10.5Z" fill="white"/></svg></span>
+    </div>
+
+    <header class="register-head">
+      <h1 id="register-title">Créer votre compte</h1>
+      <p>Rejoignez Fasthome et créez votre espace personnel.</p>
+    </header>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="register-errors" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+
+      <div class="register-grid">
+        {% for field in form %}
+          {% if field.name == 'password' or field.name == 'password_confirmation' %}
+            {% if field.name == 'password' %}<div class="register-section"><h2 class="register-section-title">Sécurité du compte</h2></div>{% endif %}
+          {% endif %}
+          <div class="register-field {% if field.name == 'email' or field.name == 'phone' or field.name == 'birth_date' or field.name == 'profession' or field.name == 'password' or field.name == 'password_confirmation' %}full{% endif %}">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {{ field.errors }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <button class="register-submit" type="submit">Créer mon compte</button>
+    </form>
+
+    <div class="register-divider"><span>ou</span></div>
+    <p class="register-login">Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
+    <div class="register-security"><span></span> Vos données sont protégées par Fasthome</div>
+  </section>
+</main>
+{% endblock %}

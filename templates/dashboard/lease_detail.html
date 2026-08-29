@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Bail — Fasthome{% endblock %}
+{% block content %}
+<main class="fh-lease">
+  <header class="fh-topbar">
+    <div><div class="fh-kicker">DOSSIER DE LOCATION</div><h1>Détail du bail</h1><p>Informations contractuelles et suivi de la location</p></div>
+    <div class="fh-avatar">{{ request.user.first_name|default:request.user.username|slice:':2'|upper }}</div>
+  </header>
+
+  <section class="fh-hero">
+    <div><span class="fh-status">{{ lease.get_status_display }}</span><h2>{{ lease.lease_id }}</h2><p>{{ lease.property.property_type }} · {{ lease.property.property_id }}</p></div>
+    <div class="fh-hero-icon">⌂</div>
+  </section>
+
+  <section class="fh-stats">
+    <article><small>LOYER MENSUEL</small><strong>{{ lease.monthly_rent }} FC</strong></article>
+    <article><small>ÉCHÉANCES</small><strong>{{ installments|length }}</strong></article>
+    <article><small>DOCUMENTS</small><strong>{{ contracts|length|add:reports|length }}</strong></article>
+  </section>
+
+  <section class="fh-card fh-parties">
+    <h2>Informations contractuelles</h2>
+    <div class="fh-info-grid">
+      <div><span>Locataire</span><strong>{{ lease.tenant.get_full_name|default:lease.tenant.username }}</strong></div>
+      <div><span>Bailleur</span><strong>{{ lease.landlord.get_full_name|default:lease.landlord.username }}</strong></div>
+      <div><span>Logement</span><strong>{{ lease.property.property_type }} · {{ lease.property.property_id }}</strong></div>
+      <div><span>Loyer</span><strong>{{ lease.monthly_rent }} FC / mois</strong></div>
+      <div><span>Début</span><strong>{{ lease.start_date|default:'—' }}</strong></div>
+      <div><span>Garantie</span><strong>{{ lease.guarantee_amount|default:'—' }} FC</strong></div>
+    </div>
+  </section>
+
+  <section class="fh-card"><div class="fh-section-head"><div><h2>📄 Contrats</h2><p>Documents contractuels associés à cette location.</p></div></div>
+    {% for c in contracts %}<article class="fh-row"><div><strong>{{ c.get_contract_type_display }}</strong><span>{{ c.contract_id }}</span></div><div class="fh-row-actions"><b>{{ c.get_status_display }}</b>{% if c.signed_document %}<a href="{% url 'contract_document' contract_id=c.contract_id %}">Ouvrir →</a>{% endif %}</div></article>{% empty %}<div class="fh-empty">Contrats en préparation.</div>{% endfor %}
+  </section>
+
+  <section class="fh-card"><h2>📋 Procès-verbaux</h2><p class="fh-muted">États et documents de constat liés au dossier.</p>
+    {% for r in reports %}<article class="fh-row"><div><strong>{{ r.get_report_type_display }}</strong><span>{{ r.report_id }}</span></div><b>{{ r.get_status_display }}</b></article>{% empty %}<div class="fh-empty">Aucun PV enregistré.</div>{% endfor %}
+  </section>
+
+  <section class="fh-card"><h2>💰 Échéances & paiements reçus</h2><p class="fh-muted">Ce que le locataire a effectivement versé à Fasthome.</p>
+    {% for i in installments %}<article class="fh-payment"><div class="fh-row"><div><strong>Échéance · {{ i.due_date }}</strong></div><b>{{ i.get_status_display }}</b></div><div class="fh-payment-grid"><div><span>DÛ</span><strong>{{ i.amount_due }} FC</strong></div><div><span>REÇU</span><strong>{{ i.total_received }} FC</strong></div><div><span>RESTE</span><strong>{{ i.remaining_to_receive }} FC</strong></div></div>{% for p in i.payments.all %}<div class="fh-receipt"><strong>{{ p.amount }} FC</strong><span>Reçu {{ p.payment_id }} · {{ p.received_at }}{% if p.reference %} · Réf. {{ p.reference }}{% endif %}</span></div>{% endfor %}</article>{% empty %}<div class="fh-empty">Aucune échéance enregistrée.</div>{% endfor %}
+  </section>
+
+  <section class="fh-card"><h2>💸 Versements au bailleur</h2><p class="fh-muted">Flux séparé entre Fasthome et le bailleur.</p>
+    {% for i in installments %}<article class="fh-payment"><strong>Échéance {{ i.due_date }}</strong><div class="fh-payment-grid"><div><span>REÇU</span><strong>{{ i.total_received }} FC</strong></div><div><span>VERSÉ</span><strong>{{ i.total_paid_to_landlord }} FC</strong></div><div><span>À VERSER</span><strong>{{ i.remaining_to_pay_out }} FC</strong></div></div></article>{% endfor %}
+    {% for p in payouts %}<div class="fh-receipt"><strong>{{ p.amount }} FC</strong><span>{{ p.paid_at }} · {{ p.payout_id }}{% if p.reference %} · Réf. {{ p.reference }}{% endif %}</span></div>{% empty %}<div class="fh-empty">Aucun versement enregistré.</div>{% endfor %}
+  </section>
+</main>
+<style>
+.fh-lease{max-width:1120px;margin:auto;padding:22px 16px 110px;color:var(--fh-text,#1e293b)}.fh-topbar{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #edf2f7;border-radius:20px;padding:18px 22px;margin-bottom:16px;box-shadow:0 8px 28px rgba(11,34,57,.06)}.fh-kicker{font-size:.65rem;font-weight:900;letter-spacing:.12em;color:#2563eb}.fh-topbar h1{margin:5px 0 3px;font-size:1.25rem;color:#0b2239}.fh-topbar p{margin:0;color:#64748b;font-size:.8rem}.fh-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2563eb;color:#fff;font-weight:800}.fh-hero{display:flex;justify-content:space-between;align-items:center;padding:24px;border-radius:22px;background:linear-gradient(135deg,#2563eb,#174b76);color:#fff;box-shadow:0 18px 45px rgba(37,99,235,.18)}.fh-status{display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.14);font-size:.68rem;font-weight:800}.fh-hero h2{margin:9px 0 4px;font-size:1.65rem}.fh-hero p{margin:0;opacity:.8}.fh-hero-icon{font-size:3.5rem;opacity:.2}.fh-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}.fh-stats article,.fh-card{background:#fff;border:1px solid #edf2f7;border-radius:18px;box-shadow:0 8px 26px rgba(11,34,57,.05)}.fh-stats article{padding:17px}.fh-stats small{display:block;color:#64748b;font-size:.64rem;font-weight:800}.fh-stats strong{display:block;margin-top:5px;font-size:1.2rem;color:#0b2239}.fh-card{padding:20px;margin-bottom:14px}.fh-card h2{margin:0;font-size:1rem;color:#0b2239}.fh-muted,.fh-card>p{margin:5px 0 13px;color:#64748b;font-size:.76rem}.fh-parties h2{margin-bottom:15px}.fh-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.fh-info-grid div{padding:12px;border-radius:13px;background:#f8fafc}.fh-info-grid span{display:block;color:#64748b;font-size:.65rem}.fh-info-grid strong{display:block;margin-top:4px;font-size:.78rem}.fh-section-head{margin-bottom:10px}.fh-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px;border:1px solid #edf2f7;background:#f8fafc;border-radius:13px;margin-top:9px}.fh-row strong{display:block;font-size:.8rem}.fh-row span{display:block;color:#64748b;font-size:.68rem;margin-top:3px}.fh-row b{padding:5px 8px;border-radius:999px;background:#fff;font-size:.62rem;white-space:nowrap}.fh-row-actions{display:flex;align-items:center;gap:8px}.fh-row-actions a{color:#2563eb;font-size:.7rem;font-weight:800;text-decoration:none}.fh-payment{margin-top:10px;padding:14px;border:1px solid #edf2f7;border-radius:15px}.fh-payment .fh-row{margin:0;border:0;padding:0;background:transparent}.fh-payment-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.fh-payment-grid div{padding:10px;background:#f8fafc;border-radius:10px}.fh-payment-grid span{display:block;color:#64748b;font-size:.6rem}.fh-payment-grid strong{display:block;margin-top:3px;font-size:.75rem}.fh-receipt{display:flex;justify-content:space-between;gap:10px;margin-top:9px;padding:10px 12px;border-radius:11px;background:#f8fafc}.fh-receipt strong{font-size:.75rem}.fh-receipt span{color:#64748b;font-size:.65rem;text-align:right}.fh-empty{padding:22px;text-align:center;border:1px dashed #cbd5e1;border-radius:13px;color:#64748b;font-size:.75rem;margin-top:9px}@media(max-width:760px){.fh-lease{padding:14px 10px 100px}.fh-stats{grid-template-columns:1fr}.fh-info-grid{grid-template-columns:1fr 1fr}.fh-hero{padding:20px}.fh-row-actions{flex-direction:column;align-items:flex-end}.fh-payment-grid{grid-template-columns:1fr 1fr}}@media(max-width:480px){.fh-topbar{padding:15px}.fh-hero-icon{display:none}.fh-info-grid,.fh-payment-grid{grid-template-columns:1fr}.fh-row{align-items:flex-start;flex-direction:column}.fh-row-actions{align-items:flex-start}.fh-receipt{flex-direction:column}.fh-receipt span{text-align:left}}
+</style>
+{% endblock %}

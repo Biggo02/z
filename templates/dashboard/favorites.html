@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Fasthome · Favoris{% endblock %}
+{% block content %}
+<style>
+.fav-page{display:flex;min-height:calc(100vh - 70px);background:#f4f6fa;margin:0 -16px -45px}.fav-sidebar{width:260px;background:#fff;border-right:1px solid #edf2f7;padding:28px 18px;display:flex;flex-direction:column;flex-shrink:0}.fav-brand{display:flex;align-items:center;gap:10px;margin-bottom:32px;padding:0 4px}.fav-brand-icon{font-size:28px;color:#2563eb;background:#e8f0fe;padding:10px;border-radius:14px}.fav-brand-name{font-size:24px;font-weight:700;color:#0b1a33}.fav-brand-name span{color:#2563eb}.fav-nav{display:flex;flex-direction:column;gap:4px;flex:1}.fav-nav a,.fav-bottom a{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:12px;color:#64748b;font-weight:500;font-size:14px;text-decoration:none;transition:.2s}.fav-nav a i,.fav-bottom a i{width:22px;font-size:18px;text-align:center}.fav-nav a:hover,.fav-bottom a:hover{background:#f1f5f9;color:#0b1a33}.fav-nav a.active{background:#e8f0fe;color:#2563eb;font-weight:600}.fav-bottom{margin-top:auto;border-top:1px solid #edf2f7;padding-top:20px}.fav-main{flex:1;min-width:0;padding:24px 32px 100px}.fav-topbar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:28px;background:#fff;padding:12px 24px;border-radius:20px;box-shadow:0 1px 3px rgba(0,0,0,.02)}.fav-title h1{font-size:20px;font-weight:700;color:#0b1a33;margin:0}.fav-title p{color:#64748b;font-size:13px;margin:3px 0 0}.fav-actions{display:flex;gap:12px;align-items:center}.fav-notif{position:relative;width:40px;height:40px;display:grid;place-items:center;border-radius:40px;color:#64748b;text-decoration:none}.fav-notif:hover{background:#f1f5f9}.fav-avatar{width:40px;height:40px;background:#2563eb;color:#fff;border-radius:40px;display:flex;align-items:center;justify-content:center;font-weight:600;text-decoration:none}.fav-card{background:#fff;border-radius:20px;padding:20px 24px;border:1px solid #edf2f7;margin-bottom:20px}.fav-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.fav-card-head h2{font-size:18px;font-weight:600;margin:0;color:#0b1a33}.fav-count{color:#64748b;font-size:13px}.fav-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.fav-item{position:relative;overflow:hidden;border:1px solid #edf2f7;border-radius:18px;background:#fff;transition:.2s;min-width:0}.fav-item:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(15,23,42,.08)}.fav-media{position:relative;aspect-ratio:1.5/1;background:linear-gradient(135deg,#e9eef3,#f8fafb);overflow:hidden}.fav-media img{width:100%;height:100%;object-fit:cover;display:block}.fav-placeholder{height:100%;display:grid;place-items:center;color:#94a3b8;font-size:42px}.fav-heart{position:absolute;right:12px;top:12px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#dc2626;display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.1)}.fav-body{padding:15px}.fav-property-title{font-size:16px;font-weight:700;color:#0b1a33;margin:0 0 5px}.fav-location{font-size:12px;color:#64748b;margin:0 0 12px}.fav-specs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}.fav-spec{padding:5px 8px;border-radius:999px;background:#f8fafc;border:1px solid #edf2f7;color:#64748b;font-size:10px;font-weight:600}.fav-status{display:inline-flex;padding:4px 9px;border-radius:999px;background:#d1fae5;color:#059669;font-size:10px;font-weight:700}.fav-status.neutral{background:#f1f5f9;color:#64748b}.fav-footer{display:flex;gap:7px;margin-top:14px}.fav-btn{flex:1;min-height:38px;padding:8px 10px;border-radius:10px;border:1px solid #e2e8f0;background:#f8fafc;color:#1e293b;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer}.fav-btn-primary{background:#2563eb;border-color:#2563eb;color:#fff}.fav-remove{flex:0 0 42px;background:#fff1f2;border-color:#fecdd3;color:#be123c}.fav-empty{text-align:center;padding:55px 20px;color:#64748b}.fav-empty-icon{width:62px;height:62px;margin:0 auto 12px;border-radius:18px;display:grid;place-items:center;background:#e8f0fe;color:#2563eb;font-size:28px}.fav-empty h3{margin:0 0 6px;color:#0b1a33;font-size:18px}.fav-empty p{max-width:460px;margin:0 auto 18px;font-size:13px;line-height:1.5}.fav-summary{display:flex;align-items:center;justify-content:space-between;gap:15px;color:#64748b;font-size:13px}.fav-summary strong{color:#0b1a33}.fav-mobile{display:none}
+@media(max-width:1100px){.fav-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:992px){.fav-sidebar{display:none}.fav-main{padding:16px 14px 90px}.fav-page{margin:0 -10px -105px;min-height:calc(100vh - 60px)}}@media(max-width:680px){.fav-topbar{padding:12px 15px;border-radius:16px;margin-bottom:16px}.fav-title h1{font-size:18px}.fav-title p{display:none}.fav-notif{display:none}.fav-avatar{width:36px;height:36px}.fav-card{padding:16px 12px;border-radius:17px}.fav-card-head h2{font-size:16px}.fav-grid{grid-template-columns:1fr;gap:10px}.fav-media{aspect-ratio:1.6/1}.fav-body{padding:13px}.fav-footer{display:grid;grid-template-columns:1fr 46px}.fav-summary{align-items:flex-start;flex-direction:column;gap:5px}.fav-mobile{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,1fr);align-items:end;height:68px;padding:7px;background:#fff;border:1px solid #edf2f7;border-radius:24px;box-shadow:0 18px 55px rgba(11,34,57,.18);z-index:95}.fav-mobile a{height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#64748b;text-decoration:none;font-size:10px;font-weight:700;border-radius:18px}.fav-mobile a i{font-size:19px}.fav-mobile a.active{color:#fff;background:#2563eb}.fav-mobile .fav-plus{width:50px;height:50px;margin:-20px auto 0;border-radius:50%;color:#fff;background:#2563eb;border:4px solid #f4f6fa;font-size:10px}}
+</style>
+
+<div class="fav-page">
+  <aside class="fav-sidebar" aria-label="Navigation Fasthome">
+    <div class="fav-brand"><i class="fas fa-home fav-brand-icon"></i><div class="fav-brand-name">Fast<span>home</span></div></div>
+    <nav class="fav-nav">
+      <a href="{% url 'home' %}"><i class="fas fa-th-large"></i>Accueil</a>
+      <a href="{% url 'matching' %}"><i class="fas fa-search"></i>Recherche</a>
+      <a href="{% url 'property_create' %}"><i class="fas fa-plus-circle"></i>Publier</a>
+      <a href="{% url 'my_properties' %}"><i class="fas fa-building"></i>Mes logements</a>
+      <a href="{% url 'favorites' %}" class="active"><i class="fas fa-heart"></i>Favoris</a>
+      <a href="{% url 'notifications' %}"><i class="fas fa-bell"></i>Notifications{% if notification_unread_count %}<span style="margin-left:auto;background:#fee2e2;color:#dc2626;border-radius:999px;padding:2px 7px;font-size:10px">{{ notification_unread_count }}</span>{% endif %}</a>
+    </nav>
+    <div class="fav-bottom"><a href="{% url 'profile' %}"><i class="fas fa-user-tie"></i>Espace personnel</a></div>
+  </aside>
+
+  <main class="fav-main">
+    <header class="fav-topbar">
+      <div class="fav-title"><h1>Mes favoris</h1><p>Vos coups de cœur</p></div>
+      <div class="fav-actions"><a class="fav-notif" href="{% url 'notifications' %}" aria-label="Notifications"><i class="far fa-bell"></i>{% if notification_unread_count %}<span class="notification-badge">{{ notification_unread_count }}</span>{% endif %}</a><a class="fav-avatar" href="{% url 'profile' %}" aria-label="Profil">{% if request.user.first_name or request.user.last_name %}{{ request.user.first_name|slice:':1' }}{{ request.user.last_name|slice:':1' }}{% else %}{{ request.user.username|slice:':2'|upper }}{% endif %}</a></div>
+    </header>
+
+    <section class="fav-card">
+      <div class="fav-card-head"><h2>❤️ Vos logements sauvegardés</h2><span class="fav-count">{{ items|length }} logement{{ items|length|pluralize }}</span></div>
+      <div class="fav-grid">
+        {% for item in items %}
+          {% with p=item.property %}
+          <article class="fav-item">
+            <div class="fav-media">{% with photo=p.photos.first %}{% if photo and photo.image %}<img src="{{ photo.image.url }}" alt="Photo du logement" loading="lazy">{% else %}<div class="fav-placeholder"><i class="fas fa-house"></i></div>{% endif %}{% endwith %}<div class="fav-heart" aria-label="Favori actif"><i class="fas fa-heart"></i></div></div>
+            <div class="fav-body">
+              <h3 class="fav-property-title">{{ p.property_type }}</h3>
+              <p class="fav-location">{{ p.city_or_territory }}{% if p.neighborhood %} · {{ p.neighborhood }}{% endif %}</p>
+              <div class="fav-specs"><span class="fav-spec">🛏 {{ p.bedroom_count }} chambre{{ p.bedroom_count|pluralize }}</span><span class="fav-spec">🛋 {{ p.living_room_count }} salon{{ p.living_room_count|pluralize }}</span>{% if p.furnished %}<span class="fav-spec">Meublé</span>{% endif %}</div>
+              {% if p.status == 'AVAILABLE' %}<span class="fav-status">● Disponible</span>{% elif p.status == 'RENTED' %}<span class="fav-status neutral">● Loué</span>{% else %}<span class="fav-status neutral">{{ p.get_status_display }}</span>{% endif %}
+              <div class="fav-footer"><a class="fav-btn fav-btn-primary" href="{% url 'property_detail' p.property_id %}">Voir le logement →</a><form method="post" action="{% url 'toggle_favorite' p.property_id %}" style="margin:0;display:contents">{% csrf_token %}<input type="hidden" name="next" value="{% url 'favorites' %}"><button class="fav-btn fav-remove" type="submit" aria-label="Retirer des favoris" title="Retirer des favoris"><i class="fas fa-heart-broken"></i></button></form></div>
+            </div>
+          </article>
+          {% endwith %}
+        {% empty %}
+          <div class="fav-empty" style="grid-column:1/-1"><div class="fav-empty-icon"><i class="far fa-heart"></i></div><h3>Aucun logement enregistré</h3><p>Les logements que vous ajoutez à vos favoris apparaîtront ici. Vous pourrez ensuite les consulter rapidement depuis votre espace.</p><a class="fav-btn fav-btn-primary" style="max-width:220px;margin:auto" href="{% url 'matching' %}">Rechercher un logement</a></div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section class="fav-card fav-summary"><span>❤️ <strong>{{ items|length }}</strong> logement{{ items|length|pluralize }} sauvegardé{{ items|length|pluralize }}</span><span>Les prix restent masqués selon le parcours Fasthome.</span></section>
+  </main>
+</div>
+
+<nav class="fav-mobile" aria-label="Navigation mobile"><a href="{% url 'home' %}"><i class="fas fa-home"></i><span>Accueil</span></a><a href="{% url 'matching' %}"><i class="fas fa-search"></i><span>Recherche</span></a><a href="{% url 'property_create' %}" class="fav-plus"><i class="fas fa-plus"></i><span>Publier</span></a><a href="{% url 'my_properties' %}"><i class="fas fa-building"></i><span>Logements</span></a><a href="{% url 'favorites' %}" class="active"><i class="fas fa-heart"></i><span>Favoris</span></a></nav>
+{% endblock %}

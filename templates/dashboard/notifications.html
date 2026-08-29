@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Notifications — Fasthome{% endblock %}
+{% block content %}
+<main class="fh-notifications">
+  <header class="fh-topbar">
+    <div><h1>Centre de notifications</h1><p>Vos alertes et les événements importants de votre parcours Fasthome.</p></div>
+    <div class="fh-avatar">{{ request.user.first_name|default:request.user.username|slice:':2'|upper }}</div>
+  </header>
+
+  <section class="fh-summary">
+    <div><strong>{{ unread_count|default:0 }} notification{{ unread_count|default:0|pluralize }} à traiter</strong><span> Les messages non lus restent prioritaires.</span></div>
+    {% if unread_count %}<form method="post" action="{% url 'mark_all_notifications_read' %}" class="mark-all-form">{% csrf_token %}<button type="submit">✓ Tout marquer comme lu</button></form>{% endif %}
+  </section>
+
+  <section class="fh-list">
+    {% for n in items %}
+      <article class="fh-notification {% if not n.is_read %}unread{% endif %}">
+        <div class="fh-dot"></div>
+        <div class="fh-body">
+          <div class="fh-meta"><span class="fh-badge">{{ n.get_level_display }}</span>{% if not n.is_read %}<span class="fh-new">● Nouvelle</span>{% endif %}</div>
+          <h2>{{ n.title }}</h2>
+          <p>{{ n.message }}</p>
+          <div class="fh-footer"><small>{{ n.created_at|date:"d/m/Y à H:i" }}</small><form class="notification-open-form" method="post" action="{% url 'mark_notification_read' notification_id=n.notification_id %}" data-next="{{ n.action_url }}">{% csrf_token %}<button type="submit">{% if n.is_read %}Ouvrir{% else %}Voir le détail{% endif %} →</button></form></div>
+        </div>
+      </article>
+    {% empty %}
+      <div class="fh-empty"><div>✓</div><h2>Tout est calme</h2><p>Aucune notification pour le moment.</p></div>
+    {% endfor %}
+  </section>
+</main>
+<style>
+.fh-notifications{max-width:1120px;margin:auto;padding:24px 16px 110px;color:#1e293b}.fh-topbar{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #edf2f7;border-radius:20px;padding:18px 22px;margin-bottom:18px;box-shadow:0 8px 28px rgba(11,34,57,.06)}.fh-topbar h1{margin:0;font-size:1.25rem;color:#0b2239}.fh-topbar p{margin:5px 0 0;color:#64748b;font-size:.8rem}.fh-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:#2563eb;color:#fff;font-weight:800}.fh-summary{display:flex;justify-content:space-between;align-items:center;gap:15px;background:#fff;border:1px solid #edf2f7;border-radius:18px;padding:16px 20px;margin-bottom:18px}.fh-summary strong{display:block}.fh-summary span{color:#64748b;font-size:.76rem}.fh-summary button,.fh-footer button{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:11px;padding:9px 14px;font-weight:750;cursor:pointer}.fh-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fh-notification{display:flex;gap:12px;background:#fff;border:1px solid #edf2f7;border-radius:18px;padding:18px;min-height:165px;box-shadow:0 8px 24px rgba(11,34,57,.05)}.fh-notification.unread{border-left:4px solid #c79a45;background:linear-gradient(135deg,#fff,rgba(199,154,69,.045))}.fh-dot{width:8px;height:8px;flex:0 0 8px;margin-top:7px;border-radius:50%;background:#b7c1cb}.unread .fh-dot{background:#c79a45}.fh-body{min-width:0;flex:1;display:flex;flex-direction:column}.fh-meta{display:flex;gap:8px;align-items:center}.fh-badge,.fh-new{display:inline-flex;padding:5px 9px;border-radius:999px;font-size:.68rem;font-weight:800}.fh-badge{background:#f1f5f9;color:#475569}.fh-new{color:#a27624;background:#fbf4e6}.fh-notification h2{font-size:1rem;margin:10px 0 5px}.fh-notification p{margin:0;color:#64748b;line-height:1.55;font-size:.86rem}.fh-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:auto;padding-top:15px}.fh-footer small{color:#94a3b8}.fh-empty{grid-column:1/-1;text-align:center;background:#fff;border:1px solid #edf2f7;border-radius:20px;padding:50px 20px}.fh-empty div{font-size:2rem}.fh-empty h2{margin:10px 0 5px}.fh-empty p{margin:0;color:#64748b}@media(max-width:760px){.fh-notifications{padding:14px 10px 100px}.fh-list{grid-template-columns:1fr}.fh-summary{align-items:flex-start;flex-wrap:wrap}.mark-all-form{width:100%}.mark-all-form button{width:100%}.fh-topbar{padding:15px}.fh-notification{min-height:0}.fh-footer{align-items:flex-end}.fh-footer form{margin-left:auto}}@media(max-width:480px){.fh-footer{flex-wrap:wrap}.fh-footer form{width:100%}.fh-footer button{width:100%}}
+</style>
+<script>
+document.querySelectorAll('.notification-open-form').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();const next=form.dataset.next||'{% url 'notifications' %}';try{await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'X-Requested-With':'XMLHttpRequest'}})}finally{window.location.href=next}}));
+document.querySelectorAll('.mark-all-form').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();try{await fetch(form.action,{method:'POST',body:new FormData(form),headers:{'X-Requested-With':'XMLHttpRequest'}})}finally{window.location.reload()}}));
+</script>
+{% endblock %}

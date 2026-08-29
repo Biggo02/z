@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block title %}Fasthome — Publications{% endblock %}
+{% block content %}
+<style>
+.pub-shell{max-width:1180px;margin:auto}.pub-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:22px}.pub-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;font-weight:900;color:var(--accent)}.pub-head h1{font-size:clamp(1.7rem,4vw,2.3rem);margin:.25rem 0;letter-spacing:-.04em}.pub-head p{margin:0;color:var(--muted)}.pub-panel{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 14px 42px rgba(11,34,57,.06)}.pub-toolbar{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.pub-search{flex:1;min-width:220px;padding:11px 13px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}.pub-list{display:grid;gap:0}.pub-item{padding:20px;border-bottom:1px solid var(--border)}.pub-item:last-child{border-bottom:0}.pub-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}.pub-title{margin:0;font-size:1rem}.pub-meta{margin:6px 0;color:var(--muted);font-size:.86rem}.pub-id{font-size:.72rem;color:var(--muted);font-weight:800}.badge{display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:.7rem;font-weight:900;background:#fef3c7;color:#8a6500}.badge.published{background:#d1fae5;color:#24613f}.pub-details{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.detail{padding:7px 10px;border-radius:10px;background:var(--surface2);font-size:.78rem}.correction{padding:10px 12px;border-radius:12px;background:#fff7ed;color:#9a5b08;margin:12px 0;font-size:.82rem}.pub-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.pub-form input{flex:1;min-width:230px;padding:10px 12px;border:1px solid var(--border);border-radius:11px}.pub-form .btn{border:0;cursor:pointer}.pub-empty{padding:28px;text-align:center;color:var(--muted)}@media(max-width:700px){.pub-form input{min-width:100%}.pub-form .btn{flex:1}}
+</style>
+<main class="container pub-shell">
+  <div class="pub-head"><div><div class="pub-kicker">Administration</div><h1>Publications</h1><p>Vérifiez les annonces avant leur mise en visibilité. Le loyer reste masqué au public.</p></div><a class="btn btn-light" href="{% url 'office_dashboard' %}">← Tableau de bord</a></div>
+  <section class="pub-panel">
+    <div class="pub-toolbar"><input class="pub-search" type="search" placeholder="Rechercher une publication, un logement ou un propriétaire…" oninput="filterPublications(this.value)"><span class="muted">{{ publications|length }} publication{{ publications|length|pluralize }} affichée{{ publications|length|pluralize }}</span></div>
+    <div class="pub-list" id="pub-list">
+    {% for publication in publications %}
+      <article class="pub-item" data-search="{{ publication.publication_id }} {{ publication.property.property_id }} {{ publication.property.property_type }} {{ publication.property.province }} {{ publication.property.city_or_territory }} {{ publication.property.neighborhood }} {{ publication.property.owner.fasthome_id }} {{ publication.get_status_display }}">
+        <div class="pub-top"><div><h3 class="pub-title">{{ publication.publication_id }} · {{ publication.property.property_id }}</h3><div class="pub-id">Propriétaire : {{ publication.property.owner.fasthome_id }}</div></div><span class="badge {% if publication.status == 'published' %}published{% endif %}">{{ publication.get_status_display }}</span></div>
+        <p class="pub-meta"><strong>{{ publication.property.property_type }}</strong> · {{ publication.property.province }} · {{ publication.property.city_or_territory }} · {{ publication.property.neighborhood }}</p>
+        <div class="pub-details"><span class="detail">🛏 {{ publication.property.bedroom_count }} chambres</span><span class="detail">🛋 {{ publication.property.living_room_count }} salons</span><span class="detail">👥 {{ publication.property.max_occupants }} occupants max.</span></div>
+        {% if publication.correction_message %}<div class="correction"><strong>Correction demandée :</strong> {{ publication.correction_message }}</div>{% endif %}
+        <form class="pub-form" method="post" action="{% url 'office_publication_decision' publication.publication_id %}">{% csrf_token %}<input name="reason" placeholder="Motif si une correction est nécessaire" aria-label="Motif de correction"><button class="btn btn-primary" name="action" value="approve">✓ Publier</button><button class="btn btn-light" name="action" value="correction">Demander une correction</button></form>
+      </article>
+    {% empty %}<div class="pub-empty">Aucune publication à traiter.</div>{% endfor %}
+    </div>
+  </section>
+</main>
+<script>function filterPublications(q){q=q.toLowerCase().trim();document.querySelectorAll('#pub-list .pub-item').forEach(r=>r.style.display=r.dataset.search.toLowerCase().includes(q)?'':'none')}</script>
+{% endblock %}

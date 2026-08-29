@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Fasthome — Utilisateurs & agents{% endblock %}
+{% block content %}
+<style>
+.users-shell{max-width:1180px;margin:auto}.users-head{display:flex;justify-content:space-between;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-bottom:22px}.users-kicker{font-size:.72rem;text-transform:uppercase;letter-spacing:.12em;font-weight:900;color:var(--accent)}.users-head h1{font-size:clamp(1.7rem,4vw,2.3rem);margin:.25rem 0;letter-spacing:-.04em}.users-head p{margin:0;color:var(--muted)}.users-actions{display:flex;gap:8px;flex-wrap:wrap}.users-panel{background:var(--surface);border:1px solid var(--border);border-radius:22px;overflow:hidden;box-shadow:0 14px 42px rgba(11,34,57,.06)}.users-toolbar{padding:16px;border-bottom:1px solid var(--border);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.users-search{flex:1;min-width:220px;padding:11px 13px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text)}.users-table{width:100%;border-collapse:collapse;font-size:.84rem}.users-table th,.users-table td{padding:14px 16px;text-align:left;border-bottom:1px solid var(--border);vertical-align:middle}.users-table th{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);background:var(--surface2)}.users-table tr:last-child td{border-bottom:0}.identity{display:flex;align-items:center;gap:10px}.avatar-user{width:38px;height:38px;border-radius:12px;background:var(--surface2);color:var(--accent);display:grid;place-items:center;font-weight:900}.identity strong{display:block}.identity small,.contact-small{color:var(--muted)}.role{display:inline-block;padding:5px 9px;border-radius:999px;background:var(--surface2);color:var(--text);font-size:.68rem;font-weight:900}.role.admin{background:#e8eef9;color:#244d82}.role.agent{background:#edf6f0;color:#24613f}.cert{font-size:.78rem;font-weight:800}.cert.ok{color:#24613f}.cert.wait{color:#8a6500}@media(max-width:800px){.users-panel{overflow:auto}.users-table{min-width:760px}.users-actions{width:100%}.users-actions .btn{flex:1;text-align:center}}
+</style>
+<main class="container users-shell">
+  <div class="users-head"><div><div class="users-kicker">Administration</div><h1>Utilisateurs & agents</h1><p>Supervision des comptes Fasthome et de leur statut opérationnel.</p></div><div class="users-actions"><a class="btn btn-light" href="{% url 'office_dashboard' %}">← Tableau de bord</a><a class="btn btn-primary" href="{% url 'admin:index' %}">Administration technique</a></div></div>
+  <section class="users-panel">
+    <div class="users-toolbar"><input class="users-search" type="search" placeholder="Rechercher un nom, email ou ID…" oninput="filterUsers(this.value)"><span class="muted">{{ users|length }} comptes affichés</span></div>
+    <table class="users-table" id="users-table"><thead><tr><th>Utilisateur</th><th>Rôle</th><th>Contact</th><th>Certification</th><th>Inscription</th></tr></thead><tbody>
+    {% for user in users %}<tr data-search="{{ user.get_full_name }} {{ user.email }} {{ user.fasthome_id }} {{ user.phone }}">
+      <td><div class="identity"><div class="avatar-user">{{ user.first_name|first|upper|default:'F' }}</div><div><strong>{{ user.get_full_name|default:user.email }}</strong><small>{{ user.fasthome_id }}</small></div></div></td>
+      <td>{% if user.is_superuser %}<span class="role admin">ADMINISTRATEUR</span>{% elif user.is_staff %}<span class="role agent">AGENT</span>{% else %}<span class="role">UTILISATEUR</span>{% endif %}</td>
+      <td><strong>{{ user.email }}</strong><br><small class="contact-small">{{ user.phone }}</small></td>
+      <td>{% if user.is_certified %}<span class="cert ok">✓ Certifié</span>{% else %}<span class="cert wait">● À vérifier</span>{% endif %}</td>
+      <td>{{ user.created_at|date:'d/m/Y' }}</td>
+    </tr>{% empty %}<tr><td colspan="5" class="muted">Aucun utilisateur.</td></tr>{% endfor %}
+    </tbody></table>
+  </section>
+</main>
+<script>function filterUsers(q){q=q.toLowerCase().trim();document.querySelectorAll('#users-table tbody tr[data-search]').forEach(r=>r.style.display=r.dataset.search.toLowerCase().includes(q)?'':'none')}</script>
+{% endblock %}

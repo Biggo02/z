@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Relecture — Fasthome{% endblock %}
+{% block content %}
+<style>
+.review-shell{max-width:900px;margin:0 auto;padding:24px 14px 48px}.review-hero{margin-bottom:20px}.review-kicker{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border-radius:999px;background:#e8f0fe;color:#2563eb;font-size:.76rem;font-weight:800}.review-hero h1{margin:12px 0 7px;font-size:clamp(1.7rem,4vw,2.35rem);letter-spacing:-.03em;color:#0b1a33}.review-hero p{max-width:720px;color:#64748b;line-height:1.6;margin:0}.review-card{background:#fff;border:1px solid #e8edf3;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 5px 22px rgba(15,23,42,.045)}.review-card h2{font-size:1.02rem;color:#0b1a33;margin:0 0 15px}.property-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.property-title h2{margin:0;font-size:1.25rem}.property-ref{font-size:.75rem;color:#64748b;background:#f8fafc;border:1px solid #e5eaf0;padding:6px 9px;border-radius:999px}.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.summary-item{background:#f8fafc;border:1px solid #edf1f5;border-radius:13px;padding:13px}.summary-item small{display:block;color:#64748b;font-size:.72rem;margin-bottom:4px}.summary-item strong{display:block;color:#0f172a;font-size:.92rem;overflow-wrap:anywhere}.check-intro{padding:13px 14px;border-radius:13px;background:#fff8e8;color:#74520a;font-size:.86rem;line-height:1.5;margin-bottom:10px}.check-intro.ok{background:#edf9f1;color:#146c37}.check-list{display:grid;gap:0}.check-item{display:flex;gap:12px;align-items:flex-start;padding:14px 0;border-bottom:1px solid #edf0f3}.check-item:last-child{border-bottom:0;padding-bottom:0}.check-icon{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;flex:0 0 28px;font-weight:900;font-size:.8rem}.check-bad{background:#fff0f0;color:#b42318}.check-item strong{color:#0f172a;font-size:.88rem}.check-item p{margin:3px 0 0;color:#64748b;font-size:.84rem;line-height:1.5}.actions{display:flex;gap:10px}.actions form{flex:1;display:flex}.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:11px 18px;border-radius:12px;border:1px solid transparent;font-weight:700;font-size:.9rem;cursor:pointer;text-decoration:none;transition:.18s ease}.btn-primary{background:#2563eb;color:#fff;box-shadow:0 5px 14px rgba(37,99,235,.18)}.btn-primary:hover{background:#1d4ed8}.btn-light{background:#fff;color:#475569;border-color:#cbd5e1}.btn-light:hover{background:#f8fafc}.btn:focus-visible{outline:3px solid rgba(37,99,235,.2);outline-offset:2px}.confirm-text{margin:0 0 12px;color:#64748b;font-size:.82rem;line-height:1.5}@media(max-width:650px){.review-shell{padding:14px 10px 34px}.review-card{padding:15px;border-radius:16px}.property-title{align-items:flex-start;flex-direction:column}.summary-grid{grid-template-columns:repeat(2,1fr);gap:8px}.actions{display:grid;grid-template-columns:1fr}.actions form{width:100%}.actions .btn{width:100%}}
+</style>
+<main class="container review-shell">
+  <header class="review-hero">
+    <span class="review-kicker">✓ Étape finale · Vérification</span>
+    <h1>Vérifiez votre publication</h1>
+    <p>Avant de l’envoyer à Fasthome, contrôlez les informations de votre logement et les éléments obligatoires. Vous pourrez ensuite demander la vérification de votre publication.</p>
+  </header>
+  <section class="review-card">
+    <div class="property-title"><h2>{{ property.property_type }}</h2><span class="property-ref">Réf. {{ property.property_id }}</span></div>
+    <div class="summary-grid">
+      <div class="summary-item"><small>Localisation</small><strong>{{ property.city_or_territory|default:'Non renseignée' }}</strong></div>
+      <div class="summary-item"><small>Loyer mensuel</small><strong>{{ property.monthly_rent|default:'Non renseigné' }}</strong></div>
+      <div class="summary-item"><small>Chambres</small><strong>{{ property.bedroom_count }}</strong></div>
+      <div class="summary-item"><small>Salons</small><strong>{{ property.living_room_count }}</strong></div>
+      <div class="summary-item"><small>Photos</small><strong>{{ property.photos.count }}</strong></div>
+      <div class="summary-item"><small>Capacité</small><strong>{{ property.max_occupants }}</strong></div>
+    </div>
+  </section>
+  <section class="review-card">
+    <h2>Contrôle avant envoi</h2>
+    {% if checklist %}
+      <div class="check-intro">⚠️ Votre publication nécessite encore quelques corrections. Les éléments ci-dessous doivent être complétés avant l’envoi.</div>
+      <div class="check-list">
+        {% for key, message in checklist %}<div class="check-item"><span class="check-icon check-bad">!</span><div><strong>À compléter</strong><p>{{ message }}</p></div></div>{% endfor %}
+      </div>
+    {% else %}<div class="check-intro ok">✓ Tous les contrôles obligatoires sont satisfaisants. Votre publication est prête à être envoyée à Fasthome.</div>{% endif %}
+  </section>
+  <section class="review-card">
+    <p class="confirm-text">Après l’envoi, la publication passe en vérification par Fasthome. Le brouillon ne pourra plus être supprimé comme tel.</p>
+    <div class="actions">
+      <a class="btn btn-light" href="{% url 'property_manage' property.property_id %}">← Revenir au logement</a>
+      {% if ready_for_submission %}
+        <form method="post" action="{% url 'property_submit' property.property_id %}">{% csrf_token %}<button class="btn btn-primary" type="submit" style="width:100%" onclick="return confirm('Envoyer cette publication à Fasthome pour vérification ?');">✓ Envoyer à Fasthome</button></form>
+      {% else %}<a class="btn btn-primary" href="{% url 'property_manage' property.property_id %}">Corriger ma publication</a>{% endif %}
+    </div>
+  </section>
+</main>
+{% endblock %}

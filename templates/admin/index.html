@@ -1,0 +1,60 @@
+{% extends "admin/base_site.html" %}
+{% load i18n log %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<style>
+.fh-wrap{max-width:1200px;margin:0 auto}.fh-hero{display:flex;justify-content:space-between;align-items:center;gap:16px;background:linear-gradient(135deg,#123b63,#1d5d8f);color:#fff;border-radius:16px;padding:20px 22px;margin-bottom:16px}.fh-hero h1{margin:0 0 5px!important;color:#fff!important;font-size:25px!important}.fh-hero p{margin:0;color:#e5eff8}.fh-site{background:#fff;color:#123b63!important;text-decoration:none!important;font-weight:800;padding:9px 12px;border-radius:8px;white-space:nowrap}.fh-search{width:100%;box-sizing:border-box;border:1px solid #d5dee7;border-radius:10px;padding:10px 12px;margin-bottom:18px;background:#fff}.fh-title{font-size:17px;font-weight:850;margin:18px 0 10px;color:#172b3d}.fh-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.fh-card{background:#fff;border:1px solid #dfe7ef;border-radius:13px;overflow:hidden;box-shadow:0 5px 15px rgba(18,59,99,.06)}.fh-card-head{padding:11px 13px;background:#f7fafc;border-bottom:1px solid #e5ebf1;font-weight:850;color:#123b63}.fh-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;padding:9px}.fh-link{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:8px 9px;border-radius:8px;background:#f5f8fb;color:#172b3d!important;text-decoration:none!important;font-weight:700;font-size:12px}.fh-link:hover{background:#e9f1f7;color:#123b63!important}.fh-badge{font-size:9px;background:#e2ebf2;color:#60758a;border-radius:999px;padding:2px 5px}.fh-empty{padding:14px;color:#64748b;text-align:center}.fh-recent{margin-top:20px;background:#fff;border:1px solid #dfe7ef;border-radius:13px;overflow:hidden}.fh-recent h2{margin:0;padding:11px 13px;background:#f7fafc;font-size:15px}.actionlist{margin:0;padding:0 13px;list-style:none}.actionlist li{padding:8px 0;border-bottom:1px solid #e5ebf1;font-size:12px}.actionlist li:last-child{border-bottom:0}.actionlist a{color:#1d5d8f;font-weight:700;text-decoration:none}
+@media(max-width:800px){.fh-hero{display:block;padding:16px}.fh-hero h1{font-size:21px!important}.fh-site{display:inline-block;margin-top:12px}.fh-grid{grid-template-columns:1fr;gap:9px}.fh-links{grid-template-columns:1fr 1fr;padding:7px}.fh-link{font-size:11px;padding:7px}.fh-title{font-size:16px}}
+</style>
+
+<div class="fh-wrap">
+  <div class="fh-hero"><div><h1>Administration Fasthome</h1><p>Accédez rapidement aux logements, utilisateurs, KYC, visites, contrats et finances.</p></div><a class="fh-site" href="{{ site_url|default:'/' }}">Voir le site</a></div>
+  <input id="fh-admin-search" class="fh-search" type="search" placeholder="Rechercher un logement, un utilisateur, un KYC…" autocomplete="off" aria-label="Rechercher dans l'administration">
+
+  <div class="fh-title">Accès rapides</div>
+  <div class="fh-grid" id="fh-quick">
+    {% for app in app_list %}
+      {% if app.app_label == 'properties' %}
+      <section class="fh-card fh-app" data-search="logements biens publications déclarations photos types">
+        <div class="fh-card-head">🏠 Logements</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div>
+      </section>
+      {% elif app.app_label == 'users' %}
+      <section class="fh-card fh-app" data-search="utilisateurs comptes kyc vérification identité">
+        <div class="fh-card-head">👥 Utilisateurs & KYC</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div>
+      </section>
+      {% elif app.app_label == 'visits' %}
+      <section class="fh-card fh-app" data-search="visites demandes rendez-vous">
+        <div class="fh-card-head">📅 Visites</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div>
+      </section>
+      {% elif app.app_label == 'contracts' or app.app_label == 'leasing' %}
+      <section class="fh-card fh-app" data-search="contrats locations sorties renouvellements dossiers">
+        <div class="fh-card-head">📄 Contrats & Locations</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div>
+      </section>
+      {% elif app.app_label == 'payments' %}
+      <section class="fh-card fh-app" data-search="paiements finances reçus loyers">
+        <div class="fh-card-head">💰 Finances</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div>
+      </section>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="fh-title">Autres modules</div>
+  <div class="fh-grid" id="fh-other">
+    {% for app in app_list %}
+      {% if app.app_label != 'properties' and app.app_label != 'users' and app.app_label != 'visits' and app.app_label != 'contracts' and app.app_label != 'leasing' and app.app_label != 'payments' %}
+      <section class="fh-card fh-app" data-search="{{ app.name|lower }} {{ app.app_label|lower }}"><div class="fh-card-head">{{ app.name }}</div><div class="fh-links">{% for model in app.models %}<a class="fh-link" href="{{ model.admin_url }}">{{ model.name }}<span class="fh-badge">Gérer</span></a>{% endfor %}</div></section>
+      {% endif %}
+    {% endfor %}
+  </div>
+  <div id="fh-no-results" class="fh-empty" style="display:none">Aucun résultat.</div>
+  <div class="fh-recent"><h2>Activité récente</h2>{% get_admin_log 6 as admin_log for_user user %}{% if admin_log %}<ul class="actionlist">{% for entry in admin_log %}<li>{% if entry.is_deletion or not entry.get_admin_url %}{{ entry.object_repr }}{% else %}<a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>{% endif %} — {% if entry.content_type %}{{ entry.content_type.name|capfirst }}{% else %}Action{% endif %}</li>{% endfor %}</ul>{% else %}<div class="fh-empty">Aucune action récente.</div>{% endif %}</div>
+</div>
+<script>
+(function(){const s=document.getElementById('fh-admin-search'),cards=document.querySelectorAll('.fh-app'),empty=document.getElementById('fh-no-results');if(!s)return;s.addEventListener('input',function(){const q=this.value.trim().toLowerCase();let n=0;cards.forEach(c=>{const ok=!q||c.dataset.search.includes(q);c.style.display=ok?'':'none';if(ok)n++;});empty.style.display=n?'none':'';});})();
+</script>
+{% endblock %}

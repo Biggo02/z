@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}Contrats — Fasthome{% endblock %}
+{% block content %}
+<style>
+.contract-shell{max-width:1180px;margin:0 auto;padding-bottom:110px}
+.contract-hero{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:24px;margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:24px;box-shadow:0 12px 40px rgba(11,34,57,.06)}
+.contract-kicker{font-size:.7rem;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.contract-hero h1{margin:7px 0 4px;font-size:clamp(1.55rem,4vw,2.25rem);letter-spacing:-.04em}
+.contract-hero p{margin:0;color:var(--muted);font-size:.86rem;line-height:1.5}
+.contract-count{min-width:48px;height:48px;display:grid;place-items:center;border-radius:15px;background:var(--surface2);border:1px solid var(--border);font-size:1rem;font-weight:900;color:var(--accent)}
+.contract-list{display:grid;gap:12px}
+.contract-card{position:relative;overflow:hidden;padding:18px;border:1px solid var(--border);border-radius:20px;background:var(--surface);box-shadow:0 10px 30px rgba(11,34,57,.05);transition:transform .18s ease,box-shadow .18s ease}
+.contract-card:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(11,34,57,.08)}
+.contract-card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.8}
+.contract-top{display:flex;justify-content:space-between;gap:15px;align-items:flex-start}
+.contract-card h2{margin:0;font-size:1rem;letter-spacing:-.02em}.contract-card p{margin:6px 0;color:var(--muted);font-size:.76rem}
+.contract-status{padding:6px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border);font-size:.68rem;font-weight:900;white-space:nowrap;color:var(--accent)}
+.contract-meta{display:flex;gap:8px;flex-wrap:wrap;margin:13px 0}.contract-meta span{padding:8px 10px;border-radius:11px;background:var(--surface2);font-size:.7rem;color:var(--muted)}
+.contract-actions{display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);padding-top:12px}.contract-actions .btn{min-height:42px;border-radius:13px;font-weight:850}.contract-actions .btn-primary{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important}.contract-actions .btn-light{background:var(--surface2)!important;color:var(--text)!important;border:1px solid var(--border)!important}
+.contract-empty{text-align:center;padding:38px 20px;border:1px dashed var(--border);border-radius:20px;background:var(--surface2);color:var(--muted)}.contract-empty strong{display:block;color:var(--text);margin-bottom:4px}
+@media(min-width:760px){.contract-list{grid-template-columns:repeat(2,minmax(0,1fr))}.contract-card{padding:20px}}
+@media(max-width:620px){.contract-hero{padding:20px;border-radius:21px}.contract-top{flex-direction:column}.contract-status{align-self:flex-start}.contract-actions{display:grid;grid-template-columns:1fr}.contract-actions .btn{width:100%}}
+</style>
+<main class="container contract-shell">
+<section class="contract-hero">
+  <div><div class="contract-kicker">Espace Fasthome · Contractualisation</div><h1>Documents des contrats</h1><p>Préparez, téléversez et validez les contrats signés avec une lecture claire de chaque étape.</p></div>
+  <div class="contract-count" aria-label="Nombre de contrats">{{ contracts|length }}</div>
+</section>
+<section class="contract-list">
+{% for c in contracts %}
+<article class="contract-card">
+  <div class="contract-top"><div><h2>{{ c.contract_id }}</h2><p>{{ c.get_contract_type_display }} · Bail {{ c.lease.lease_id }}</p></div><span class="contract-status">{{ c.get_status_display }}</span></div>
+  <div class="contract-meta"><span>📄 Type : {{ c.get_contract_type_display }}</span><span>🔑 Location : {{ c.lease.lease_id }}</span></div>
+  <div class="contract-actions">
+    {% if c.status == 'PENDING' or c.status == 'UPLOADED' %}<a class="btn btn-light" href="{% url 'office_contract_upload' c.contract_id %}">Téléverser signé</a>{% endif %}
+    {% if c.status == 'UPLOADED' %}<form method="post" action="{% url 'office_contract_validate' c.contract_id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">✓ Valider</button></form>{% endif %}
+  </div>
+</article>
+{% empty %}
+<div class="contract-empty"><strong>Aucun contrat</strong>Les contrats apparaîtront ici après acceptation d'un dossier.</div>
+{% endfor %}
+</section>
+</main>
+{% endblock %}
