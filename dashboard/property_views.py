@@ -56,7 +56,7 @@ def my_properties(request):
         'all': properties.count(),
         'available': properties.filter(status='AVAILABLE').count(),
         'review': properties.filter(Q(status='UNDER_REVIEW') | Q(publication__status__in=['SUBMITTED', 'UNDER_REVIEW'])).distinct().count(),
-        'draft': properties.filter(Q(publication__isnull=True) | Q(publication__status__in=['DRAFT', 'CORRECTION_REQUIRED'])).distinct().count(),
+        'draft': properties.filter(Q(publication__isnull=True) | Q(publication__status='DRAFT')).distinct().count(),
         'rented': properties.filter(Q(status='RENTED') | Q(publication__status='RENTED')).distinct().count(),
     }
     return render(request, 'dashboard/my_properties.html', {'properties': properties, 'counts': counts})
@@ -93,7 +93,7 @@ def property_submit(request, property_id):
             messages.error(request, 'La publication n’est pas prête. Corrigez les éléments indiqués avant de l’envoyer.')
             return redirect('property_review', property_id=property_id)
         now = timezone.now()
-        publication.status = 'SUBMITTED'
+        publication.status = 'UNDER_REVIEW'
         publication.submitted_at = now
         publication.correction_message = ''
         publication.save(update_fields=['status', 'submitted_at', 'correction_message', 'updated_at'])
