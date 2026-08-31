@@ -4,7 +4,7 @@
   "remoteUser": "vscode",
   "containerEnv": {
     "DJANGO_DEBUG": "1",
-    "DJANGO_ALLOWED_HOSTS": "localhost,127.0.0.1,.app.github.dev"
+    "DJANGO_ALLOWED_HOSTS": "*"
   },
   "customizations": {
     "vscode": {
@@ -19,7 +19,9 @@
   "portsAttributes": {
     "8000": {
       "label": "Fasthome Django",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "openBrowser",
+      "protocol": "http",
+      "visibility": "public"
     }
   }
 }
