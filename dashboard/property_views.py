@@ -59,7 +59,18 @@ def my_properties(request):
         'draft': properties.filter(Q(publication__isnull=True) | Q(publication__status='DRAFT')).distinct().count(),
         'rented': properties.filter(Q(status='RENTED') | Q(publication__status='RENTED')).distinct().count(),
     }
-    return render(request, 'dashboard/my_properties.html', {'properties': properties, 'counts': counts})
+    visits = (VisitRequest.objects.filter(property__owner=request.user)
+              .select_related('property', 'property__property_type', 'requester')
+              .prefetch_related('property__photos')
+              .order_by('scheduled_at', '-created_at')[:6])
+    rented_properties = (properties.filter(Q(status='RENTED') | Q(publication__status='RENTED'))
+                         .prefetch_related('photos')[:6])
+    return render(request, 'dashboard/my_properties.html', {
+        'properties': properties,
+        'counts': counts,
+        'visits': visits,
+        'rented_properties': rented_properties,
+    })
 
 
 @login_required
