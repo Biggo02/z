@@ -62,7 +62,7 @@ def my_properties(request):
     visits = (VisitRequest.objects.filter(property__owner=request.user)
               .select_related('property', 'property__property_type', 'requester')
               .prefetch_related('property__photos')
-              .order_by('scheduled_at', '-created_at')[:6])
+              .order_by('requested_date', 'requested_time_slot', '-created_at')[:6])
     rented_properties = (properties.filter(Q(status='RENTED') | Q(publication__status='RENTED'))
                          .prefetch_related('photos')[:6])
     return render(request, 'dashboard/my_properties.html', {
